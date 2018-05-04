@@ -55,7 +55,7 @@ workflows:
               only: /.*/
       - publish:
           requires:
-            - buildAndTest
+            - build
           filters:
             tags:
               only: /^release-.*/
