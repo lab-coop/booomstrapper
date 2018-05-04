@@ -2,20 +2,20 @@
 
 ## booomstrapper
 
-### Install via NPM
+## Install via NPM
 
 ```js
-npm install -g booom-studio/booomstrapper
+npm i -g booomstrapper
 ```
 
-### Features
+## Features
 - create repository (public or private) in Github organization
 - set default branch
 - protect default branch
 - add default readme to project
 
 
-### Backlog
+## Backlog
 - apply pre-commit hook to check commit message
 - dangerfile
 - gitignore
