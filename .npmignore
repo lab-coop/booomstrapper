@@ -1,0 +1,12 @@
+.git
+*Dockerfile*
+node_modules
+.coverage
+.circleci
+.dockerignore
+.gitignore
+.babelrc
+.eslintrc
+src
+test
+logs

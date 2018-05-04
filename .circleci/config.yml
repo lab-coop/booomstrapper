@@ -11,8 +11,14 @@ jobs:
           name: Install
           command: yarn
       - run:
+          name: Linter
+          command: yarn lint
+      - run:
+          name: Babel build
+          command: npm run babel:build
+      - run:
           name: Test
-          command: yarn
+          command: yarn test
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
@@ -25,6 +31,9 @@ jobs:
       - run:
           name: Install
           command: yarn
+       - run:
+          name: Babel build
+          command: npm run babel:build
       - run:
           name: Install Cantrips
           command: sudo npm i -g cantrips@"<=1.0.0"

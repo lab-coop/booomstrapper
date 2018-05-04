@@ -48,13 +48,18 @@ protectBranch = (org, repository, branch) => {
   })
 }
 
-createRepository = async (org, name, private = false, description = '') => {
+createRepository = async (
+  org,
+  name,
+  privateRepository = false,
+  description = ''
+) => {
   try {
     var repository = await octokit.repos.createForOrg({
       org,
       name,
       description,
-      private
+      private: privateRepository
     })
     return repository
   } catch (error) {
