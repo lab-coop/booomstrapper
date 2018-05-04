@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node
+        - image: circleci/node
     steps:
       - checkout
       - restore_cache:
@@ -31,7 +31,7 @@ jobs:
       - run:
           name: Install
           command: yarn
-       - run:
+      - run:
           name: Babel build
           command: yarn babel:build
       - run:
