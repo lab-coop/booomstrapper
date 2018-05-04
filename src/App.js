@@ -5,7 +5,7 @@ const ora = require('ora')
 const GithubHandler = require('./GithubHandler')
 const GitHandler = require('./GitHandler')
 const Config = require('./Config')
-const Readme = require('./Readme')
+const ReadmeHandler = require('./ReadmeHandler')
 const Logger = require('./Logger')
 
 const spinner = ora()
@@ -63,7 +63,7 @@ program
       'Adding remote to local repository'
     )
     addSequenceItem(
-      () => Readme.addDefault(GitHandler.repoLocation, name),
+      () => ReadmeHandler.addDefault(GitHandler.repoLocation, name),
       'Adding default readme'
     )
     addSequenceItem(
