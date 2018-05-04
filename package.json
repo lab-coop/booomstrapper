@@ -1,6 +1,6 @@
 {
   "name": "booomstrapper",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "booomstrapper for easy Github repository and project creation",
   "repository": "https://github.com/booom-studio/booomstrapper.git",
   "main": "./lib/App.js",
