@@ -1,0 +1,56 @@
+version: 2
+jobs:
+  buildAndTest:
+    docker:
+        - image: circleci/node
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run:
+          name: Install
+          command: yarn
+      - run:
+          name: Test
+          command: yarn
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+  publish:
+    docker:
+       - image: circleci/node
+    steps:
+      - checkout
+      - run:
+          name: Install
+          command: yarn
+      - run:
+          name: Install Cantrips
+          command: sudo npm i -g cantrips@"<=1.0.0"
+      - run:
+          name: Npm credentials
+          command: cantrips npm credentials
+      - run:
+          name: Npm publish
+          command: npm publish
+
+
+workflows:
+  version: 2
+  buildAndPublish:
+    jobs:
+      - buildAndTest:
+          context: org-global
+          filters:
+            tags:
+              only: /.*/
+      - publish:
+          requires:
+            - buildAndTest
+          filters:
+            tags:
+              only: /^release-.*/
+            branches:
+              ignore: /.*/
+          context: org-global
