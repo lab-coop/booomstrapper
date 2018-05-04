@@ -1,3 +1,6 @@
+#! /usr/bin/env node
+'use strict'
+
 import program from 'commander'
 import packageJson from '../package.json'
 import ora from 'ora'

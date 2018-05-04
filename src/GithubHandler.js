@@ -1,3 +1,5 @@
+'use strict'
+
 import octokit from '@octokit/rest'
 import inquirer from 'inquirer'
 

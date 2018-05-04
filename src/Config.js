@@ -1,3 +1,5 @@
+'use strict'
+
 import os from 'os'
 import fs from 'fs'
 import path from 'path'
