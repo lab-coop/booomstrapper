@@ -1,8 +1,8 @@
 version: 2
 jobs:
-  buildAndTest:
+  buildgt :
     docker:
-        - image: circleci/node
+      - image: circleci/node
     steps:
       - checkout
       - restore_cache:
@@ -49,7 +49,7 @@ workflows:
   version: 2
   buildAndPublish:
     jobs:
-      - buildAndTest:
+      - build:
           context: org-global
           filters:
             tags:
