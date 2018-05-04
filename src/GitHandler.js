@@ -13,46 +13,54 @@ if (fs.existsSync(tempFolder)) {
 }
 fs.mkdirSync(tempFolder)
 
-this.repoLocation = tempFolder
-
-this.getCurrentBranch = async () => {
-  return simpleGit(this.repoLocation).branch()
+const repoLocation = tempFolder
+async function getCurrentBranch() {
+  return simpleGit(repoLocation).branch()
+}
+async function pushToRemote(elementToPush, remoteName = 'origin') {
+  return simpleGit(repoLocation).push([remoteName, elementToPush])
+}
+async function pushBranch(branch) {
+  return pushToRemote(branch)
+}
+async function pushTag(tag) {
+  await pushToRemote(tag)
+}
+async function createTag(tagName) {
+  return simpleGit(repoLocation).addTag(tagName)
+}
+async function createCommit(message = '') {
+  await simpleGit(repoLocation).add('./*')
+  return simpleGit(repoLocation).commit(message)
 }
 
-this.pushToRemote = async (elementToPush, remoteName = 'origin') => {
-  return simpleGit(this.repoLocation).push([remoteName, elementToPush])
-}
-
-this.pushBranch = async branch => {
-  return this.pushToRemote(branch)
-}
-
-this.pushTag = async tag => {
-  await this.pushToRemote(tag)
-}
-
-this.createTag = async tagName => {
-  return simpleGit(this.repoLocation).addTag(tagName)
-}
-
-this.createCommit = async (message = '') => {
-  await simpleGit(this.repoLocation).add('./*')
-  return simpleGit(this.repoLocation).commit(message)
-}
-
-this.revertRepository = async (hard = true) => {
+async function revertRepository(hard = true) {
   let mode = hard ? '--hard' : '--soft'
-  return simpleGit(this.repoLocation).reset([mode])
+  return simpleGit(repoLocation).reset([mode])
 }
 
-this.initRepository = async () => {
-  return simpleGit(this.repoLocation).init()
+async function initRepository() {
+  return simpleGit(repoLocation).init()
 }
 
-this.createBranch = async branchName => {
-  return simpleGit(this.repoLocation).checkoutLocalBranch(branchName)
+async function createBranch(branchName) {
+  return simpleGit(repoLocation).checkoutLocalBranch(branchName)
 }
 
-this.addRemote = async (remoteName, remotePath) => {
-  return await simpleGit(this.repoLocation).addRemote(remoteName, remotePath)
+async function addRemote(remoteName, remotePath) {
+  return await simpleGit(repoLocation).addRemote(remoteName, remotePath)
+}
+
+module.exports = {
+  addRemote,
+  createBranch,
+  initRepository,
+  revertRepository,
+  createCommit,
+  createTag,
+  pushTag,
+  pushBranch,
+  pushToRemote,
+  getCurrentBranch,
+  repoLocation
 }

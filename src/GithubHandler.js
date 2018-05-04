@@ -42,7 +42,7 @@ var tokenQuestion = [
 function protectBranch(org, repository, branch) {
   return octo.repos.updateBranchProtection({
     owner: org,
-    repository,
+    repo: repository,
     branch,
     required_status_checks: null,
     required_pull_request_reviews: { include_admins: false },
@@ -58,7 +58,7 @@ async function createRepository(
   description = ''
 ) {
   try {
-    var repository = await octokit.repos.createForOrg({
+    var repository = await octo.repos.createForOrg({
       org,
       name,
       description,
@@ -76,7 +76,7 @@ async function createRepository(
 }
 
 async function listRepositories(org, type = 'public') {
-  return (await octokit.repos.getForOrg({ org, type })).data.map(repo => {
+  return (await octo.repos.getForOrg({ org, type })).data.map(repo => {
     return { name: repo.full_name, url: repo.html_url }
   })
 }
