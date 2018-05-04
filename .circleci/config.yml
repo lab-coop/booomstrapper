@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  buildgt :
+  build:
     docker:
       - image: circleci/node
     steps:
@@ -15,7 +15,7 @@ jobs:
           command: yarn lint
       - run:
           name: Babel build
-          command: npm run babel:build
+          command: yarn babel:build
       - run:
           name: Test
           command: yarn test
@@ -33,7 +33,7 @@ jobs:
           command: yarn
        - run:
           name: Babel build
-          command: npm run babel:build
+          command: yarn babel:build
       - run:
           name: Install Cantrips
           command: sudo npm i -g cantrips@"<=1.0.0"
@@ -43,7 +43,6 @@ jobs:
       - run:
           name: Npm publish
           command: npm publish
-
 
 workflows:
   version: 2
