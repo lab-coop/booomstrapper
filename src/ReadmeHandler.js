@@ -1,7 +1,9 @@
-const fs = require('fs')
-const path = require('path')
+'use strict'
 
-addDefault = (repoPath, repoName) => {
+import fs from 'fs'
+import path from 'path'
+
+function addDefault(repoPath, repoName) {
   fs.writeFileSync(
     path.join(repoPath, 'Readme.md'),
     `## ${repoName}\n\nRepository created via Boomstrapper`

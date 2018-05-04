@@ -1,8 +1,8 @@
-var simpleGit = require('simple-git/promise')
-const osTmpdir = require('os-tmpdir')
-var fs = require('fs')
-var path = require('path')
-var rimraf = require('rimraf')
+import simpleGit from 'simple-git/promise'
+import osTmpdir from 'os-tmpdir'
+import fs from 'fs'
+import path from 'path'
+import rimraf from 'rimraf'
 
 const tempFolder = path.join(osTmpdir(), 'booomstrapper_temp_dir')
 
@@ -29,11 +29,11 @@ this.pushTag = async tag => {
   await this.pushToRemote(tag)
 }
 
-this.createTag = async (tagName, message = '') => {
+this.createTag = async tagName => {
   return simpleGit(this.repoLocation).addTag(tagName)
 }
 
-this.createCommit = async (message = '', filesToAdd = []) => {
+this.createCommit = async (message = '') => {
   await simpleGit(this.repoLocation).add('./*')
   return simpleGit(this.repoLocation).commit(message)
 }

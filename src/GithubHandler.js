@@ -1,13 +1,14 @@
-const octokit = require('@octokit/rest')()
-const inquirer = require('inquirer')
-const path = require('path')
+import octokit from '@octokit/rest'
+import inquirer from 'inquirer'
 
-const Config = require('./Config')
-const Logger = require('./Logger')
+import Config from './Config'
+import Logger from './Logger'
+
+const octo = octokit()
 
 var authInfo = Config.get('github.auth')
 if (!authInfo) {
-  octokit.authenticate(authInfo)
+  octo.authenticate(authInfo)
 }
 
 let authMethodSelection = [
@@ -36,8 +37,8 @@ var tokenQuestion = [
   }
 ]
 
-protectBranch = (org, repository, branch) => {
-  return octokit.repos.updateBranchProtection({
+function protectBranch(org, repository, branch) {
+  return octo.repos.updateBranchProtection({
     owner: org,
     repository,
     branch,
@@ -48,12 +49,12 @@ protectBranch = (org, repository, branch) => {
   })
 }
 
-createRepository = async (
+async function createRepository(
   org,
   name,
   privateRepository = false,
   description = ''
-) => {
+) {
   try {
     var repository = await octokit.repos.createForOrg({
       org,
@@ -72,13 +73,13 @@ createRepository = async (
   }
 }
 
-listRepositories = async (org, type = 'public') => {
+async function listRepositories(org, type = 'public') {
   return (await octokit.repos.getForOrg({ org, type })).data.map(repo => {
     return { name: repo.full_name, url: repo.html_url }
   })
 }
 
-checkAuthInfo = async configFileName => {
+async function checkAuthInfo() {
   var authInfo = Config.get('github.auth')
   if (!authInfo) {
     Logger.info('Github authentication info is missing. Please provide them.\n')
@@ -90,7 +91,7 @@ checkAuthInfo = async configFileName => {
     }
     Config.set('github.auth', authInfo)
   }
-  octokit.authenticate(Config.get('github.auth'))
+  octo.authenticate(Config.get('github.auth'))
 }
 
 module.exports = {

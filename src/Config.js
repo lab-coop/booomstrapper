@@ -1,20 +1,15 @@
-const os = require('os')
-const fs = require('fs')
-const path = require('path')
-const { get, set } = require('lodash')
+import os from 'os'
+import fs from 'fs'
+import path from 'path'
+import { get, set } from 'lodash'
+
 const homeDir = os.homedir()
 const defaultConfigFolder = path.join(homeDir, '.booomstrapper')
 const defaultConfigFile = path.join(defaultConfigFolder, 'config.json')
 
-const defaultConfigPath = path.join(
-  homeDir,
-  defaultConfigFolder,
-  defaultConfigFile
-)
-
 var configFileContent = new Map()
 
-initializeConfig = () => {
+function initializeConfig() {
   if (!fs.existsSync(defaultConfigFolder)) {
     fs.mkdirSync(defaultConfigFolder)
   }
