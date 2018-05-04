@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/booom-studio/boomstrapper/tree/master.svg?style=svg)](https://circleci.com/gh/booom-studio/boomstrapper/tree/master)
+
 ## booomstrapper
 
 ### Install via NPM

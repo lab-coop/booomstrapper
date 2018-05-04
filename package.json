@@ -1,9 +1,12 @@
 {
   "name": "booomstrapper",
   "version": "0.9.0",
-  "description": "booomstrapper",
+  "description": "booomstrapper for easy Github repository and project creation",
   "repository": "https://github.com/booom-studio/booomstrapper.git",
-  "main": "src/App.js",
+  "main": "./lib/App.js",
+  "bin": {
+    "booom": "./lib/App.js"
+  },
   "scripts": {
     "precommit": "lint-staged",
     "lint": "eslint src",
