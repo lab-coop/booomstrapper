@@ -14,6 +14,7 @@ if (fs.existsSync(tempFolder)) {
 fs.mkdirSync(tempFolder)
 
 const repoLocation = tempFolder
+
 async function getCurrentBranch() {
   return simpleGit(repoLocation).branch()
 }
@@ -51,6 +52,16 @@ async function addRemote(remoteName, remotePath) {
   return await simpleGit(repoLocation).addRemote(remoteName, remotePath)
 }
 
+function addDefaultHooks() {
+  const hooks = fs.readdirSync('./scripts/hooks/')
+  hooks.forEach(hook => {
+    fs.copyFileSync(
+      path.join('.', 'scripts', 'hooks', hook),
+      path.join(repoLocation, '.git', 'hooks', hook.replace('.sample', ''))
+    )
+  })
+}
+
 module.exports = {
   addRemote,
   createBranch,
@@ -62,5 +73,6 @@ module.exports = {
   pushBranch,
   pushToRemote,
   getCurrentBranch,
-  repoLocation
+  repoLocation,
+  addDefaultHooks
 }
