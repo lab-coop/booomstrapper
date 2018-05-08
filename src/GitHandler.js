@@ -5,6 +5,7 @@ import osTmpdir from 'os-tmpdir'
 import fs from 'fs'
 import path from 'path'
 import rimraf from 'rimraf'
+import Logger from './Logger'
 
 import Logger from './Logger'
 
@@ -21,7 +22,9 @@ function setRepositoryPath(newPath) {
   Logger.debug('Git repository path:', repoLocation)
 }
 
-function getRepositoryPath() {return repoLocation}
+function getRepositoryPath() {
+  return repoLocation
+}
 
 async function getCurrentBranch() {
   return simpleGit(repoLocation).branch()
