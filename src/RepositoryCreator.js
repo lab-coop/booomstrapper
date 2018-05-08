@@ -3,7 +3,7 @@ import inquirer from 'inquirer'
 import GitHandler from './GitHandler'
 import GithubHandler from './GithubHandler'
 import ReadmeHandler from './ReadmeHandler'
-import { initializeCreateReactApp } from './CreateReactApp'
+import { initializeCreateReactApp, installPackages } from './JsProjectHandler'
 
 import { addSequenceItem, runSequence } from './SeqenceRunner'
 
@@ -74,6 +74,15 @@ var projectCreationParametersQuestions = [
     default: function() {
       return true
     }
+  },
+  {
+    type: 'checkbox',
+    message: 'Which packages should be installed?',
+    name: 'packagesToInstall',
+    choices: [
+      { name: 'prettier', checked: true },
+      { name: 'eslint', checked: true }
+    ]
   }
 ]
 
@@ -112,6 +121,16 @@ async function createRepository() {
     addSequenceItem(
       () => initializeCreateReactApp(GitHandler.repoLocation),
       'Initializing create-react-app in the repository'
+    )
+  }
+  if (repositoryDetails.packagesToInstall) {
+    addSequenceItem(
+      () =>
+        installPackages(
+          GitHandler.repoLocation,
+          repositoryDetails.packagesToInstall
+        ),
+      'Installing given packages'
     )
   }
   addSequenceItem(
