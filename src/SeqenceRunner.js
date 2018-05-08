@@ -9,7 +9,9 @@ function addSequenceItem(command, text) {
 
 async function runSequence() {
   for (let sequenceItem of sequenceItems) {
-    if (!(await run(sequenceItem.command, sequenceItem.text))) return
+    if (!(await run(sequenceItem.command, sequenceItem.text))) {
+      return
+    }
   }
 }
 
