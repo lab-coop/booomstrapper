@@ -3,6 +3,7 @@ import inquirer from 'inquirer'
 import GitHandler from './GitHandler'
 import GithubHandler from './GithubHandler'
 import ReadmeHandler from './ReadmeHandler'
+import { initializeCreateReactApp } from './CreateReactApp'
 
 import { addSequenceItem, runSequence } from './SeqenceRunner'
 
@@ -65,6 +66,14 @@ var projectCreationParametersQuestions = [
     default: function() {
       return true
     }
+  },
+  {
+    type: 'input',
+    name: 'isCreateReactApp',
+    message: 'Should create-react-app be used?',
+    default: function() {
+      return true
+    }
   }
 ]
 
@@ -99,6 +108,12 @@ async function createRepository() {
       ),
     'Adding remote to local repository'
   )
+  if (repositoryDetails.isCreateReactApp) {
+    addSequenceItem(
+      () => initializeCreateReactApp(GitHandler.repoLocation),
+      'Initializing create-react-app in the repository'
+    )
+  }
   addSequenceItem(
     () =>
       ReadmeHandler.addDefault(

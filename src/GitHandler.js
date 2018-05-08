@@ -5,6 +5,7 @@ import osTmpdir from 'os-tmpdir'
 import fs from 'fs'
 import path from 'path'
 import rimraf from 'rimraf'
+import Logger from './Logger'
 
 import Logger from './Logger'
 
@@ -17,7 +18,6 @@ fs.mkdirSync(tempFolder)
 
 const repoLocation = tempFolder
 Logger.debug('Git repository path:', repoLocation)
-
 
 async function getCurrentBranch() {
   return simpleGit(repoLocation).branch()
