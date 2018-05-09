@@ -11,8 +11,6 @@ import { createRepository } from './RepositoryCreator'
 
 program.version(packageJson.version)
 
-program.option('-d, --debug', 'Debug mode')
-
 program.command('list-repositories <org>').action(async org => {
   const repositories = await GithubHandler.listRepositories(org)
   repositories.forEach(repository => {
