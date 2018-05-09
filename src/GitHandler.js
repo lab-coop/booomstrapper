@@ -15,7 +15,6 @@ if (fs.existsSync(tempFolder)) {
 fs.mkdirSync(tempFolder)
 
 const repoLocation = tempFolder
-Logger.info(repoLocation)
 
 async function getCurrentBranch() {
   return simpleGit(repoLocation).branch()
