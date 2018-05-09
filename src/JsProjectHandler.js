@@ -1,4 +1,3 @@
-import path from 'path'
 import { runCommand } from './utils/SystemUtils'
 
 async function initializeCreateReactApp(repositoryPath) {
