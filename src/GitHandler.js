@@ -6,6 +6,8 @@ import fs from 'fs'
 import path from 'path'
 import rimraf from 'rimraf'
 
+import Logger from './Logger'
+
 const tempFolder = path.join(osTmpdir(), 'booomstrapper_temp_dir')
 
 if (fs.existsSync(tempFolder)) {
@@ -14,6 +16,8 @@ if (fs.existsSync(tempFolder)) {
 fs.mkdirSync(tempFolder)
 
 const repoLocation = tempFolder
+Logger.debug('Git repository path:', repoLocation)
+
 
 async function getCurrentBranch() {
   return simpleGit(repoLocation).branch()
