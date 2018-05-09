@@ -26,6 +26,7 @@ async function run(delegate, text) {
   try {
     await delegate()
   } catch (error) {
+    console.log(error)
     spinner.fail(`${text} - ${error.message}`)
     return false
   }
