@@ -3,7 +3,7 @@ import inquirer from 'inquirer'
 import GitHandler from './GitHandler'
 import GithubHandler from './GithubHandler'
 import ReadmeHandler from './ReadmeHandler'
-import { initializeCreateReactApp, installPackages, addDefaultConfigs } from './JsProjectHandler'
+import { initializeCreateReactApp, installPackages } from './JsProjectHandler'
 
 import { addSequenceItem, runSequence } from './SequenceRunner'
 
