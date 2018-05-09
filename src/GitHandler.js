@@ -65,7 +65,7 @@ function addDefaultHooks() {
   })
 }
 
-function addDefaultGitIgnore(repoPath) {
+function addDefaultGitIgnore() {
   fs.copyFileSync(
     path.join('.', 'scripts', 'misc', '.gitignore'),
     path.join(repoLocation, '.gitignore')

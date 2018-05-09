@@ -3,10 +3,6 @@ import fs from 'fs'
 import path from 'path'
 
 import { runCommand } from './utils/SystemUtils'
-import { addSequenceItem } from './SequenceRunner'
-
-import Logger from './Logger'
-import { createCipher } from 'crypto';
 
 const defaultConfigs = {
   eslint: '.eslintrc',
