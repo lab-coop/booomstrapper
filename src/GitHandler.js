@@ -5,7 +5,6 @@ import osTmpdir from 'os-tmpdir'
 import fs from 'fs'
 import path from 'path'
 import rimraf from 'rimraf'
-import Logger from './Logger'
 
 const tempFolder = path.join(osTmpdir(), 'booomstrapper_temp_dir')
 
