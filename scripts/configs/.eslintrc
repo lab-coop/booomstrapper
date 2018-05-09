@@ -1,0 +1,30 @@
+{
+  "env": {
+    "browser": true,
+    "es6": true,
+    "node": true,
+    "jest": true
+  },
+  "extends": ["eslint:recommended", "plugin:react/recommended", "prettier"],
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaVersion": 8,
+    "ecmaFeatures": {
+      "experimentalObjectRestSpread": true,
+      "jsx": true
+    },
+    "sourceType": "module",
+    "codeFrame": false
+  },
+  "plugins": ["react", "prettier"],
+  "rules": {
+    "prettier/prettier": "error",
+    "no-console": "off",
+    "no-case-declarations": "off",
+    "react/prop-types": ["warn", { "ignore": ["children"] }],
+    "react/display-name": "off",
+    "react/react-in-jsx-scope": "off",
+    "camelcase": "warn",
+    "eqeqeq": "error"
+  }
+}

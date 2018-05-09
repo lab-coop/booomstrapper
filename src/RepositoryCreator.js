@@ -3,9 +3,9 @@ import inquirer from 'inquirer'
 import GitHandler from './GitHandler'
 import GithubHandler from './GithubHandler'
 import ReadmeHandler from './ReadmeHandler'
-import { initializeCreateReactApp, installPackages } from './JsProjectHandler'
+import { initializeCreateReactApp, installPackages, addDefaultConfigs } from './JsProjectHandler'
 
-import { addSequenceItem, runSequence } from './SeqenceRunner'
+import { addSequenceItem, runSequence } from './SequenceRunner'
 
 var projectCreationParametersQuestions = [
   {
@@ -60,7 +60,7 @@ var projectCreationParametersQuestions = [
     }
   },
   {
-    type: 'input',
+    type: 'confirm',
     name: 'isDefaultBranchProtected',
     message: 'Should be the default branch protected?',
     default: function() {
@@ -68,7 +68,7 @@ var projectCreationParametersQuestions = [
     }
   },
   {
-    type: 'input',
+    type: 'confirm',
     name: 'isCreateReactApp',
     message: 'Should create-react-app be used?',
     default: function() {
@@ -99,6 +99,17 @@ async function createRepository() {
       ),
     'Creating Github repository'
   )
+  if (repositoryDetails.isDefaultBranchProtected) {
+    addSequenceItem(
+      () =>
+        GithubHandler.protectBranch(
+          repositoryDetails.githubOrganizationName,
+          repositoryDetails.repositoryName,
+          'master'
+        ),
+      'Protecting branch'
+    )
+  }
   addSequenceItem(
     () => GitHandler.initRepository(),
     'Creating temporary local repository'
@@ -130,7 +141,7 @@ async function createRepository() {
           GitHandler.repoLocation,
           repositoryDetails.packagesToInstall
         ),
-      'Installing given packages'
+      'Installing given packages and setting configurations'
     )
   }
   addSequenceItem(
@@ -140,6 +151,13 @@ async function createRepository() {
         repositoryDetails.repositoryName
       ),
     'Adding default readme'
+  )
+  addSequenceItem(
+    () =>
+      GitHandler.addDefaultGitIgnore(
+        GitHandler.repoLocation
+      ),
+    'Adding default gitignore'
   )
   // todo: should be optional, selectable via a list
   addSequenceItem(
@@ -154,17 +172,6 @@ async function createRepository() {
     () => GitHandler.pushBranch(repositoryDetails.defaultBranchName),
     'Pushing branch to remote'
   )
-  if (repositoryDetails.isDefaultBranchProtected) {
-    addSequenceItem(
-      () =>
-        GithubHandler.protectBranch(
-          repositoryDetails.githubOrganizationName,
-          repositoryDetails.repositoryName,
-          'master'
-        ),
-      'Protecting branch'
-    )
-  }
   runSequence()
 }
 

@@ -62,6 +62,13 @@ function addDefaultHooks() {
   })
 }
 
+function addDefaultGitIgnore(repoPath) {
+  fs.copyFileSync(
+    path.join('.', 'scripts', 'misc', '.gitignore'),
+    path.join(repoLocation, '.gitignore')
+  )
+}
+
 module.exports = {
   addRemote,
   createBranch,
@@ -74,5 +81,6 @@ module.exports = {
   pushToRemote,
   getCurrentBranch,
   repoLocation,
-  addDefaultHooks
+  addDefaultHooks,
+  addDefaultGitIgnore
 }
