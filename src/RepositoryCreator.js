@@ -1,4 +1,5 @@
 import inquirer from 'inquirer'
+import path from 'path'
 
 import GitHandler from './GitHandler'
 import GithubHandler from './GithubHandler'
@@ -90,6 +91,7 @@ async function createRepository() {
   const repositoryDetails = await inquirer.prompt(
     projectCreationParametersQuestions
   )
+  GitHandler.setRepositoryPath(path.join(GitHandler.getRepositoryPath(), repositoryDetails.repositoryName))
   addSequenceItem(
     () =>
       GithubHandler.createRepository(
@@ -130,7 +132,7 @@ async function createRepository() {
   )
   if (repositoryDetails.isCreateReactApp) {
     addSequenceItem(
-      () => initializeCreateReactApp(GitHandler.repoLocation),
+      () => initializeCreateReactApp(GitHandler.getRepositoryPath()),
       'Initializing create-react-app in the repository'
     )
   }
@@ -138,7 +140,7 @@ async function createRepository() {
     addSequenceItem(
       () =>
         installPackages(
-          GitHandler.repoLocation,
+          GitHandler.getRepositoryPath(),
           repositoryDetails.packagesToInstall
         ),
       'Installing given packages and setting configurations'
@@ -147,7 +149,7 @@ async function createRepository() {
   addSequenceItem(
     () =>
       ReadmeHandler.addDefault(
-        GitHandler.repoLocation,
+        GitHandler.getRepositoryPath(),
         repositoryDetails.repositoryName
       ),
     'Adding default readme'
