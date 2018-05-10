@@ -70,7 +70,7 @@ var projectCreationParametersQuestions = [
   },
   {
     type: 'list',
-    message: 'Which packages should be installed?',
+    message: 'What type of project should be created?',
     name: 'projectType',
     choices: [{ name: 'create-react-app' }, { name: 'plain-node' }],
     validate: function(answer) {
