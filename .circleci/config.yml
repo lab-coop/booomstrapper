@@ -1,10 +1,7 @@
-defaults: &defaults
-  working_directory: /tmp
-
 version: 2
 jobs:
   build:
-    <<: *defaults
+    working_directory: ~/booomstrapper
     docker:
         - image: circleci/node
     steps:
@@ -28,16 +25,15 @@ jobs:
           paths:
             - node_modules
       - persist_to_workspace:
-          root: workspace
-          paths:
-            - .
+          root: .
+
   publish:
-    <<: *defaults
+    working_directory: ~/booomstrapper
     docker:
        - image: circleci/node
     steps:
       - attach_workspace:
-          at: /tmp/workspace
+          at: ~/booomstrapper
       - run:
           name: Install Cantrips
           command: sudo npm i -g cantrips@"<=1.0.0"
