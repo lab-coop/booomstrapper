@@ -17,15 +17,16 @@ async function initializeCreateReactApp(repositoryPath) {
 async function installPackages(repositoryPath, packages) {
   return new Promise(async (resolve, reject) => {
     try {
-      const packageName = packages.join(' ')
+      const packageNames = packages.join(' ')
       // todo: fix temp hack for yarn handling
       const originalFolder = process.cwd()
       process.chdir(repositoryPath)
-      await runCommand(
-        `yarn add ${packageName}`, false
-      )
+      await runCommand(`yarn add ${packageNames}`, false)
       process.chdir(originalFolder)
-      const availableConfigs = _.intersection(packages, Object.keys(defaultConfigs))
+      const availableConfigs = _.intersection(
+        packages,
+        Object.keys(defaultConfigs)
+      )
       availableConfigs.forEach(config => {
         fs.copyFileSync(
           path.join('.', 'scripts', 'configs', defaultConfigs[config]),
