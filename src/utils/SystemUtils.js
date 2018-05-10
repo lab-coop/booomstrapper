@@ -6,25 +6,26 @@ import Logger from '../Logger'
 async function runCommand(
   command,
   showOutput = true,
-  resolveOutput = true,
-  pathToRunOn = process.cwd()
+  pathToRunOn = process.cwd(),
+  resolveOutput = true
 ) {
   Logger.debug(`Running command: ${command}`)
+  let outputData = ''
 
-  const childProcess = exec(command, { cwd: pathToRunOn }, error => {
+  const childProcess = exec(command, { cwd: pathToRunOn }, (error, stdout) => {
     if (error) {
       Logger.error(`exec error: ${error}`)
+    } else {
+      outputData = stdout
     }
   })
-  let data = ''
-  childProcess.stdout.on('data', chunk => (data += chunk))
   if (showOutput) {
     childProcess.stdout.pipe(process.stdout)
   }
   return new Promise(resolve => {
     childProcess.on('exit', async () => {
       if (resolveOutput) {
-        resolve(data)
+        resolve(outputData)
       } else {
         resolve(true)
       }
