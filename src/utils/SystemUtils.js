@@ -7,25 +7,25 @@ async function runCommand(
   command,
   showOutput = true,
   pathToRunOn = process.cwd(),
-  resolveOutput = true
+  resolveOutput = false
 ) {
   Logger.debug(`Running command: ${command}`)
-  let outputData = ''
 
-  const childProcess = exec(command, { cwd: pathToRunOn }, (error, stdout) => {
+  const childProcess = exec(command, { cwd: pathToRunOn }, error => {
     if (error) {
       Logger.error(`exec error: ${error}`)
-    } else {
-      outputData = stdout
     }
   })
+
+  let data = ''
+  childProcess.stdout.on('data', chunk => (data += chunk))
   if (showOutput) {
     childProcess.stdout.pipe(process.stdout)
   }
   return new Promise(resolve => {
     childProcess.on('exit', async () => {
       if (resolveOutput) {
-        resolve(outputData)
+        resolve(data)
       } else {
         resolve(true)
       }
