@@ -21,7 +21,9 @@ function setRepositoryPath(newPath) {
   Logger.debug('Git repository path:', repoLocation)
 }
 
-function getRepositoryPath() {return repoLocation}
+function getRepositoryPath() {
+  return repoLocation
+}
 
 async function getCurrentBranch() {
   return simpleGit(repoLocation).branch()
