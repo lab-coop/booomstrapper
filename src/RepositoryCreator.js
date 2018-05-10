@@ -4,7 +4,7 @@ import path from 'path'
 import GitHandler from './GitHandler'
 import GithubHandler from './GithubHandler'
 import ReadmeHandler from './ReadmeHandler'
-import { initializeCreateReactApp, installPackages } from './JsProjectHandler'
+import { initializeProject, installPackages } from './JsProjectHandler'
 
 import { addSequenceItem, runSequence } from './SequenceRunner'
 
@@ -69,10 +69,14 @@ var projectCreationParametersQuestions = [
     }
   },
   {
-    type: 'confirm',
-    name: 'isCreateReactApp',
-    message: 'Should create-react-app be used?',
-    default: function() {
+    type: 'list',
+    message: 'What type of project should be created?',
+    name: 'projectType',
+    choices: [{ name: 'create-react-app' }, { name: 'plain-node' }],
+    validate: function(answer) {
+      if (answer.length < 1) {
+        return 'You must specify if the project type.'
+      }
       return true
     }
   },
@@ -132,12 +136,14 @@ async function createRepository() {
       ),
     'Adding remote to local repository'
   )
-  if (repositoryDetails.isCreateReactApp) {
-    addSequenceItem(
-      () => initializeCreateReactApp(GitHandler.getRepositoryPath()),
-      'Initializing create-react-app in the repository'
-    )
-  }
+  addSequenceItem(
+    () =>
+      initializeProject(
+        GitHandler.getRepositoryPath(),
+        repositoryDetails.projectType
+      ),
+    `Initializing ${repositoryDetails.projectType} project in the repository`
+  )
   if (repositoryDetails.packagesToInstall) {
     addSequenceItem(
       () =>

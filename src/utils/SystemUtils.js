@@ -3,16 +3,22 @@
 import { exec } from 'child_process'
 import Logger from '../Logger'
 
-async function runCommand(command, showOutput = true, resolveOutput = true) {
+async function runCommand(
+  command,
+  showOutput = true,
+  pathToRunOn = process.cwd(),
+  resolveOutput = false
+) {
   Logger.debug(`Running command: ${command}`)
 
-  const childProcess = exec(command, { cwd: process.cwd() }, error => {
+  const childProcess = exec(command, { cwd: pathToRunOn }, error => {
     if (error) {
       Logger.error(`exec error: ${error}`)
     }
   })
+
   let data = ''
-  childProcess.stdout.on('data', chunck => data += chunck)
+  childProcess.stdout.on('data', chunk => (data += chunk))
   if (showOutput) {
     childProcess.stdout.pipe(process.stdout)
   }

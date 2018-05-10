@@ -9,20 +9,20 @@ const defaultConfigs = {
   prettier: '.prettierrc'
 }
 
-async function initializeCreateReactApp(repositoryPath) {
-  // todo: check npm version
-  await runCommand(`npx create-react-app ${repositoryPath}`, false)
+async function initializeProject(repositoryPath, projectType) {
+  switch (projectType) {
+    case 'create-react-app':
+      return runCommand(`npx create-react-app ${repositoryPath}`, false)
+    case 'plain-node':
+      return runCommand('npm init -y', false, repositoryPath)
+  }
 }
 
 async function installPackages(repositoryPath, packages) {
   return new Promise(async (resolve, reject) => {
     try {
       const packageNames = packages.join(' ')
-      // todo: fix temp hack for yarn handling
-      const originalFolder = process.cwd()
-      process.chdir(repositoryPath)
-      await runCommand(`yarn add ${packageNames}`, false)
-      process.chdir(originalFolder)
+      await runCommand(`yarn add ${packageNames}`, false, repositoryPath)
       const availableConfigs = _.intersection(
         packages,
         Object.keys(defaultConfigs)
@@ -41,6 +41,6 @@ async function installPackages(repositoryPath, packages) {
 }
 
 module.exports = {
-  initializeCreateReactApp,
-  installPackages
+  installPackages,
+  initializeProject
 }
