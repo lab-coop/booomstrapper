@@ -26,6 +26,7 @@ jobs:
             - node_modules
       - persist_to_workspace:
           root: .
+          paths: .
 
   publish:
     working_directory: ~/booomstrapper
