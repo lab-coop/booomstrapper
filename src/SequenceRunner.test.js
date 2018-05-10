@@ -9,15 +9,15 @@ test.serial('added sequence item should be called if runSequence is called', asy
   let wasSequenceItemCalled = false
   addSequenceItem(() => wasSequenceItemCalled = true, 'This should be called')
   await runSequence()
-  t.true(wasSequenceItemCalled, 'Added sequence item was not called!')
+  t.true(wasSequenceItemCalled)
 })
 
 test.serial('sequence items after a failing sequence item should not be executed', async t => {
   let wasSequenceItemCalled = false
   addSequenceItem(() => {throw new Error('error in the sequence')}, 'This will fail')
-  addSequenceItem(() => wasSequenceItemCalled = true, 'This should be called')
+  addSequenceItem(() => wasSequenceItemCalled = true, 'This should not be called')
   await runSequence()
-  t.false(wasSequenceItemCalled, 'Sequence item comming after a failing item was run!')
+  t.false(wasSequenceItemCalled)
 })
 
 test.serial('runSequence() should empty the sequence queue', async t => {
