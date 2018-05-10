@@ -109,9 +109,9 @@ async function createRepository() {
         GithubHandler.protectBranch(
           repositoryDetails.githubOrganizationName,
           repositoryDetails.repositoryName,
-          'master'
+          repositoryDetails.defaultBranchName
         ),
-      'Protecting branch'
+      `Protecting default branch: ${repositoryDetails.defaultBranchName}`
     )
   }
   addSequenceItem(
