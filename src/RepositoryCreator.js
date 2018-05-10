@@ -91,7 +91,9 @@ async function createRepository() {
   const repositoryDetails = await inquirer.prompt(
     projectCreationParametersQuestions
   )
-  GitHandler.setRepositoryPath(path.join(GitHandler.getRepositoryPath(), repositoryDetails.repositoryName))
+  GitHandler.setRepositoryPath(
+    path.join(GitHandler.getRepositoryPath(), repositoryDetails.repositoryName)
+  )
   addSequenceItem(
     () =>
       GithubHandler.createRepository(
@@ -118,7 +120,7 @@ async function createRepository() {
   )
   addSequenceItem(
     () => GitHandler.createBranch(repositoryDetails.defaultBranchName),
-    'Creating master branch'
+    `Creating default branch: ${repositoryDetails.defaultBranchName}`
   )
   addSequenceItem(
     () =>
@@ -155,10 +157,7 @@ async function createRepository() {
     'Adding default readme'
   )
   addSequenceItem(
-    () =>
-      GitHandler.addDefaultGitIgnore(
-        GitHandler.repoLocation
-      ),
+    () => GitHandler.addDefaultGitIgnore(GitHandler.repoLocation),
     'Adding default gitignore'
   )
   // todo: should be optional, selectable via a list
