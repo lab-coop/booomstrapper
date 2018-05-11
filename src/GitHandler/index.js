@@ -77,7 +77,8 @@ function addHooks(filters) {
   const hooks = readHooks()
   const scriptsToIncludeByHookType = filterHookScriptsToInclude(hooks, filters)
   createHookFiles(scriptsToIncludeByHookType, repoLocation)
-  
+}
+
 function addDefaultGitIgnore() {
   fs.copyFileSync(
     path.join('.', 'scripts', 'misc', '.gitignore'),

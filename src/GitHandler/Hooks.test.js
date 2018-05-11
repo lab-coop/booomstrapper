@@ -1,8 +1,7 @@
 import test from 'ava'
 import mockFs from 'mock-fs'
-import fs from 'fs'
 
-import { readHooks, filterHookScriptsToInclude, createHookFiles } from './Hooks'
+import { readHooks, filterHookScriptsToInclude } from './Hooks'
 
 const preCommit = {
   'angular.sample': 'script to verify angular commit meaages pre commit'
