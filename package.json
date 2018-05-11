@@ -24,9 +24,9 @@
   },
   "nyc": {
     "check-coverage": true,
-    "lines": 9,
-    "statements": 11,
-    "functions": 8,
+    "lines": 3,
+    "statements": 6,
+    "functions": 5,
     "include": [
       "src/**/*.js"
     ],
@@ -44,7 +44,8 @@
     ],
     "require": [
       "@babel/register"
-    ]
+    ],
+    "serial": true
   },
   "dependencies": {
     "@babel/runtime": "7.0.0-beta.44",
