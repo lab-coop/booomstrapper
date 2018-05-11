@@ -4,9 +4,9 @@ import simpleGit from 'simple-git/promise'
 import osTmpdir from 'os-tmpdir'
 import fs from 'fs'
 import path from 'path'
-import rimraf from 'rimraf'
 
 import Logger from '../Logger'
+import { createEmptyFolder } from '../utils/SystemUtils'
 import { readHooks, createHookFiles, filterHookScriptsToInclude } from './Hooks'
 
 var repoLocation
@@ -15,10 +15,7 @@ setRepositoryPath(tempFolder)
 
 function setRepositoryPath(newPath) {
   repoLocation = newPath
-  if (fs.existsSync(repoLocation)) {
-    rimraf.sync(repoLocation)
-  }
-  fs.mkdirSync(repoLocation)
+  createEmptyFolder(repoLocation)
   Logger.debug('Git repository path:', repoLocation)
 }
 

@@ -1,5 +1,7 @@
 'use strict'
 
+import fs from 'fs'
+import rimraf from 'rimraf'
 import { exec } from 'child_process'
 import Logger from '../Logger'
 
@@ -33,6 +35,14 @@ async function runCommand(
   })
 }
 
+function createEmptyFolder(folderPath) {
+  if (fs.existsSync(folderPath)) {
+    rimraf.sync(folderPath)
+  }
+  fs.mkdirSync(folderPath)
+}
+
 module.exports = {
-  runCommand
+  runCommand,
+  createEmptyFolder
 }
