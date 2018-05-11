@@ -85,8 +85,12 @@ var projectCreationParametersQuestions = [
     message: 'Which packages should be installed?',
     name: 'packagesToInstall',
     choices: [
-      { name: 'prettier', checked: true },
-      { name: 'eslint', checked: true }
+      {
+        name: 'prettier',
+        value: { name: 'prettier', env: 'dev' },
+        checked: true
+      },
+      { name: 'eslint', value: { name: 'eslint', env: 'dev' }, checked: true }
     ]
   }
 ]
@@ -107,17 +111,6 @@ async function createRepository() {
       ),
     'Creating Github repository'
   )
-  if (repositoryDetails.isDefaultBranchProtected) {
-    addSequenceItem(
-      () =>
-        GithubHandler.protectBranch(
-          repositoryDetails.githubOrganizationName,
-          repositoryDetails.repositoryName,
-          repositoryDetails.defaultBranchName
-        ),
-      `Protecting default branch: ${repositoryDetails.defaultBranchName}`
-    )
-  }
   addSequenceItem(
     () => GitHandler.initRepository(),
     'Creating temporary local repository'
@@ -179,6 +172,17 @@ async function createRepository() {
     () => GitHandler.pushBranch(repositoryDetails.defaultBranchName),
     'Pushing branch to remote'
   )
+  if (repositoryDetails.isDefaultBranchProtected) {
+    addSequenceItem(
+      () =>
+        GithubHandler.protectBranch(
+          repositoryDetails.githubOrganizationName,
+          repositoryDetails.repositoryName,
+          repositoryDetails.defaultBranchName
+        ),
+      `Protecting default branch: ${repositoryDetails.defaultBranchName}`
+    )
+  }
   runSequence()
 }
 
