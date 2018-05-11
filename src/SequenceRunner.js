@@ -16,7 +16,7 @@ async function runSequence() {
     if (!(await run(sequenceItem.command, sequenceItem.text))) {
       clearSequence()
       return
-    } 
+    }
   }
   clearSequence()
 }

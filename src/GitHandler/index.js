@@ -9,15 +9,22 @@ import rimraf from 'rimraf'
 import Logger from '../Logger'
 import { readHooks, createHookFiles, filterHookScriptsToInclude } from './Hooks'
 
+var repoLocation
 const tempFolder = path.join(osTmpdir(), 'booomstrapper_temp_dir')
+setRepositoryPath(tempFolder)
 
-if (fs.existsSync(tempFolder)) {
-  rimraf.sync(tempFolder)
+function setRepositoryPath(newPath) {
+  repoLocation = newPath
+  if (fs.existsSync(repoLocation)) {
+    rimraf.sync(repoLocation)
+  }
+  fs.mkdirSync(repoLocation)
+  Logger.debug('Git repository path:', repoLocation)
 }
-fs.mkdirSync(tempFolder)
 
-const repoLocation = tempFolder
-Logger.debug('Git repository path:', repoLocation)
+function getRepositoryPath() {
+  return repoLocation
+}
 
 async function getCurrentBranch() {
   return simpleGit(repoLocation).branch()
@@ -53,7 +60,7 @@ async function createBranch(branchName) {
 }
 
 async function addRemote(remoteName, remotePath) {
-  return await simpleGit(repoLocation).addRemote(remoteName, remotePath)
+  return simpleGit(repoLocation).addRemote(remoteName, remotePath)
 }
 
 function addDefaultHooks() {
@@ -70,6 +77,12 @@ function addHooks(filters) {
   const hooks = readHooks()
   const scriptsToIncludeByHookType = filterHookScriptsToInclude(hooks, filters)
   createHookFiles(scriptsToIncludeByHookType, repoLocation)
+  
+function addDefaultGitIgnore() {
+  fs.copyFileSync(
+    path.join('.', 'scripts', 'misc', '.gitignore'),
+    path.join(repoLocation, '.gitignore')
+  )
 }
 
 module.exports = {
@@ -85,5 +98,8 @@ module.exports = {
   getCurrentBranch,
   repoLocation,
   addDefaultHooks,
-  addHooks
+  addHooks,
+  addDefaultGitIgnore,
+  setRepositoryPath,
+  getRepositoryPath
 }

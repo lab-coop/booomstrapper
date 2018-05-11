@@ -1,10 +1,12 @@
 import inquirer from 'inquirer'
+import path from 'path'
 
 import GitHandler from './GitHandler'
 import GithubHandler from './GithubHandler'
 import ReadmeHandler from './ReadmeHandler'
+import { initializeProject, installPackages } from './JsProjectHandler'
 
-import { addSequenceItem, runSequence } from './SeqenceRunner'
+import { addSequenceItem, runSequence } from './SequenceRunner'
 
 var projectCreationParametersQuestions = [
   {
@@ -59,18 +61,42 @@ var projectCreationParametersQuestions = [
     }
   },
   {
-    type: 'input',
+    type: 'confirm',
     name: 'isDefaultBranchProtected',
     message: 'Should be the default branch protected?',
     default: function() {
       return true
     }
+  },
+  {
+    type: 'list',
+    message: 'What type of project should be created?',
+    name: 'projectType',
+    choices: [{ name: 'create-react-app' }, { name: 'plain-node' }],
+    validate: function(answer) {
+      if (answer.length < 1) {
+        return 'You must specify if the project type.'
+      }
+      return true
+    }
+  },
+  {
+    type: 'checkbox',
+    message: 'Which packages should be installed?',
+    name: 'packagesToInstall',
+    choices: [
+      { name: 'prettier', checked: true },
+      { name: 'eslint', checked: true }
+    ]
   }
 ]
 
 async function createRepository() {
   const repositoryDetails = await inquirer.prompt(
     projectCreationParametersQuestions
+  )
+  GitHandler.setRepositoryPath(
+    path.join(GitHandler.getRepositoryPath(), repositoryDetails.repositoryName)
   )
   addSequenceItem(
     () =>
@@ -81,13 +107,24 @@ async function createRepository() {
       ),
     'Creating Github repository'
   )
+  if (repositoryDetails.isDefaultBranchProtected) {
+    addSequenceItem(
+      () =>
+        GithubHandler.protectBranch(
+          repositoryDetails.githubOrganizationName,
+          repositoryDetails.repositoryName,
+          repositoryDetails.defaultBranchName
+        ),
+      `Protecting default branch: ${repositoryDetails.defaultBranchName}`
+    )
+  }
   addSequenceItem(
     () => GitHandler.initRepository(),
     'Creating temporary local repository'
   )
   addSequenceItem(
     () => GitHandler.createBranch(repositoryDetails.defaultBranchName),
-    'Creating master branch'
+    `Creating default branch: ${repositoryDetails.defaultBranchName}`
   )
   addSequenceItem(
     () =>
@@ -101,11 +138,33 @@ async function createRepository() {
   )
   addSequenceItem(
     () =>
+      initializeProject(
+        GitHandler.getRepositoryPath(),
+        repositoryDetails.projectType
+      ),
+    `Initializing ${repositoryDetails.projectType} project in the repository`
+  )
+  if (repositoryDetails.packagesToInstall) {
+    addSequenceItem(
+      () =>
+        installPackages(
+          GitHandler.getRepositoryPath(),
+          repositoryDetails.packagesToInstall
+        ),
+      'Installing given packages and setting configurations'
+    )
+  }
+  addSequenceItem(
+    () =>
       ReadmeHandler.addDefault(
-        GitHandler.repoLocation,
+        GitHandler.getRepositoryPath(),
         repositoryDetails.repositoryName
       ),
     'Adding default readme'
+  )
+  addSequenceItem(
+    () => GitHandler.addDefaultGitIgnore(GitHandler.repoLocation),
+    'Adding default gitignore'
   )
   // todo: should be optional, selectable via a list
   addSequenceItem(
@@ -120,17 +179,6 @@ async function createRepository() {
     () => GitHandler.pushBranch(repositoryDetails.defaultBranchName),
     'Pushing branch to remote'
   )
-  if (repositoryDetails.isDefaultBranchProtected) {
-    addSequenceItem(
-      () =>
-        GithubHandler.protectBranch(
-          repositoryDetails.githubOrganizationName,
-          repositoryDetails.repositoryName,
-          'master'
-        ),
-      'Protecting branch'
-    )
-  }
   runSequence()
 }
 
