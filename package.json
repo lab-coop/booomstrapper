@@ -10,7 +10,7 @@
   "scripts": {
     "precommit": "lint-staged",
     "lint": "eslint src",
-    "test": "ava src/**/*.test.js",
+    "test": "ava  src/*.test.js src/**/*.test.js",
     "babel:build": "babel src -d lib",
     "babel:watch": "babel src -d lib -w"
   },
