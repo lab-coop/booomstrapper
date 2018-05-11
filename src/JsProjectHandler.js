@@ -22,7 +22,7 @@ async function initializeProject(repositoryPath, projectType) {
  * @param {{name: string, env?: string}[]} packages
  * @private
  */
-function _generateInstallPackagesCommands(packages) {
+function _generateInstallPackageCommands(packages) {
   const packagesByEnv = []
   const envIndexInList = {}
   packages.forEach(npmPackage => {
@@ -59,7 +59,7 @@ function _assembleInstallCommands(packagesByEnv) {
 async function installPackages(repositoryPath, packages) {
   return new Promise(async (resolve, reject) => {
     try {
-      const installCommands = _generateInstallPackagesCommands(packages)
+      const installCommands = _generateInstallPackageCommands(packages)
       await Promise.all(
         installCommands.map(installCommand =>
           runCommand(installCommand, false, repositoryPath)
@@ -86,5 +86,5 @@ async function installPackages(repositoryPath, packages) {
 module.exports = {
   installPackages,
   initializeProject,
-  _generateInstallPackagesCommands
+  _generateInstallPackageCommands
 }
