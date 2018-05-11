@@ -6,7 +6,8 @@ import fs from 'fs'
 import path from 'path'
 import rimraf from 'rimraf'
 
-import Logger from './Logger'
+import Logger from '../Logger'
+import { readHooks, createHookFiles, filterHookScriptsToInclude } from './Hooks'
 
 const tempFolder = path.join(osTmpdir(), 'booomstrapper_temp_dir')
 
@@ -17,7 +18,6 @@ fs.mkdirSync(tempFolder)
 
 const repoLocation = tempFolder
 Logger.debug('Git repository path:', repoLocation)
-
 
 async function getCurrentBranch() {
   return simpleGit(repoLocation).branch()
@@ -66,6 +66,12 @@ function addDefaultHooks() {
   })
 }
 
+function addHooks(filters) {
+  const hooks = readHooks()
+  const scriptsToIncludeByHookType = filterHookScriptsToInclude(hooks, filters)
+  createHookFiles(scriptsToIncludeByHookType, repoLocation)
+}
+
 module.exports = {
   addRemote,
   createBranch,
@@ -78,5 +84,6 @@ module.exports = {
   pushToRemote,
   getCurrentBranch,
   repoLocation,
-  addDefaultHooks
+  addDefaultHooks,
+  addHooks
 }
