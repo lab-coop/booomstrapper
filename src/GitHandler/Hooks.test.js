@@ -24,26 +24,26 @@ test.after(() => {
 test('readHooks return list of valid hooks', t => {
   const hooks = readHooks()
   t.deepEqual(hooks, {
-    'pre-commit': [
-      {
+    'pre-commit': {
+      angular: {
         ruleName: 'angular',
         script: preCommit['angular.sample']
       }
-    ]
+    }
   })
 })
 
 test('filterHookScriptsToInclude returns the correct hooks files based on hooks and settings', t => {
   const hooks = {
-    'pre-commit': [
-      {
+    'pre-commit': {
+      angular: {
         ruleName: 'angular',
         script: 'angular commit message script'
       },
-      {
+      'do-not-include': {
         ruleName: 'do-not-include'
       }
-    ]
+    }
   }
   const filter = ['pre-commit/angular']
   t.deepEqual(filterHookScriptsToInclude(hooks, filter), {
