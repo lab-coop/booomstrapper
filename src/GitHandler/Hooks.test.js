@@ -7,10 +7,9 @@ import {
   initializeTestProject,
   projectHasDependencies
 } from '../utils/TestUtils'
-import { addHooks } from './Hooks'
+import { addHooks, getHooks } from './Hooks'
 
 const HooksModule = rewire('./Hooks')
-const readHooks = HooksModule.__get__('readHooks')
 const filterHookScriptsToInclude = HooksModule.__get__(
   'filterHookScriptsToInclude'
 )
@@ -30,10 +29,10 @@ const hookFile = {
 const hookFolderPath = path.join(__dirname, '../../scripts/hooks/')
 const hookFilePath = `${hookFolderPath}/${hookFile.name}`
 
-test.serial('readHooks return list of valid hooks', t => {
+test.serial('getHooks return list of valid hooks', t => {
   fs.outputFileSync(hookFilePath, hookFile.content)
 
-  const hooks = readHooks()
+  const hooks = getHooks()
   t.deepEqual(hooks, [angularSettings])
 
   fs.removeSync(hookFilePath)

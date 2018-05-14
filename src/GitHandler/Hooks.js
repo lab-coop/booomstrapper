@@ -20,7 +20,7 @@ const HOOK_DIR = '../../scripts/hooks'
  * reads the hooks from HOOK_DIR
  * @return {ParsedHook[]}
  */
-function readHooks() {
+function getHooks() {
   let hooksToAdd = fs.readdirSync(path.join(__dirname, HOOK_DIR))
   return hooksToAdd
     .filter(hookPath => hookPath.endsWith('.js'))
@@ -55,11 +55,12 @@ async function addHuskyHooks(scriptsToInclude, repositoryPath) {
  * @param {string} repositoryPath
  */
 async function addHooks(filters, repositoryPath) {
-  const hooks = readHooks()
+  const hooks = getHooks()
   const scriptsToInclude = filterHookScriptsToInclude(hooks, filters)
   await addHuskyHooks(scriptsToInclude, repositoryPath)
 }
 
 module.exports = {
-  addHooks
+  addHooks,
+  getHooks
 }
