@@ -14,47 +14,8 @@ const filterHookScriptsToInclude = HooksModule.__get__(
   'filterHookScriptsToInclude'
 )
 
-const angularSettings = {
-  ruleName: 'angular---test',
-  execute: 'validate-commit-msg',
-  dependencies: ['validate-commit'],
-  hookType: 'commitmsg'
-}
-
-const hookFile = {
-  name: 'test-angular-commit-msg.js',
-  content: `module.exports = ${JSON.stringify(angularSettings)}`
-}
-
-const hookFolderPath = path.join(__dirname, '../../scripts/hooks/')
-const hookFilePath = `${hookFolderPath}/${hookFile.name}`
-
-test.serial('getHooks return list of valid hooks', t => {
-  fs.outputFileSync(hookFilePath, hookFile.content)
-
-  const hooks = getHooks()
-
-  t.deepEqual(
-    hooks.filter(hook => hook.ruleName === angularSettings.ruleName),
-    [angularSettings]
-  )
-
-  fs.removeSync(hookFilePath)
-})
-
-test('filterHookScriptsToInclude returns the correct hooks files based on hooks and settings', t => {
-  const anOtherHook = {
-    ...angularSettings,
-    ruleName: 'anOtherHook'
-  }
-  const hooks = [angularSettings, anOtherHook]
-  const filter = [angularSettings.ruleName]
-  t.deepEqual(filterHookScriptsToInclude(hooks, filter), [angularSettings])
-})
-
-// Integration test
-
-const TEST_HOOK_PATH = './scripts/hooks/pre-commit-test.js'
+const HOOK_FOLDER_PATH = path.join(__dirname, '../../scripts/hooks/')
+const TEST_HOOK_PATH = `${HOOK_FOLDER_PATH}/pre-commit-test.js`
 const TEST_HOOK_CONTENT = {
   ruleName: 'angular',
   execute: 'validate-commit-msg',
@@ -62,14 +23,40 @@ const TEST_HOOK_CONTENT = {
   hookType: 'commitmsg'
 }
 
+const TEST_HOOK_FILE_CONTENT = `module.exports = ${JSON.stringify(
+  TEST_HOOK_CONTENT
+)}`
+
+test.serial('getHooks return list of valid hooks', t => {
+  fs.outputFileSync(TEST_HOOK_PATH, TEST_HOOK_FILE_CONTENT)
+
+  const hooks = getHooks()
+
+  t.deepEqual(
+    hooks.filter(hook => hook.ruleName === TEST_HOOK_CONTENT.ruleName),
+    [TEST_HOOK_CONTENT]
+  )
+
+  fs.removeSync(TEST_HOOK_PATH)
+})
+
+test('filterHookScriptsToInclude returns the correct hooks files based on hooks and settings', t => {
+  const anOtherHook = {
+    ...TEST_HOOK_CONTENT,
+    ruleName: 'anOtherHook'
+  }
+  const hooks = [TEST_HOOK_CONTENT, anOtherHook]
+  const filter = [TEST_HOOK_CONTENT.ruleName]
+  t.deepEqual(filterHookScriptsToInclude(hooks, filter), [TEST_HOOK_CONTENT])
+})
+
+// Integration test
+
 test.serial(
   'add hooks should create a .githooks directory and uptade package.json',
   async t => {
     const testProjectPath = await initializeTestProject()
-    fs.outputFileSync(
-      TEST_HOOK_PATH,
-      `module.exports = ${JSON.stringify(TEST_HOOK_CONTENT)}`
-    )
+    fs.outputFileSync(TEST_HOOK_PATH, TEST_HOOK_FILE_CONTENT)
     await addHooks(['pre-commit-test'], testProjectPath)
 
     const hasRequiredDependencies = projectHasDependencies(testProjectPath, [
