@@ -1,15 +1,9 @@
-import path from 'path'
-import osTmpdir from 'os-tmpdir'
 import test from 'ava'
 import readPkgUp from 'read-pkg-up'
 import rimraf from 'rimraf'
 
-import { createEmptyFolder } from './utils/SystemUtils'
-import {
-  initializeProject,
-  addScript,
-  _generateInstallPackageCommands
-} from './JsProjectHandler'
+import { addScript, _generateInstallPackageCommands } from './JsProjectHandler'
+import { initializeTestProject } from './utils/TestUtils'
 
 test('addScript adds a script to an existing node project', async t => {
   const tempTestFolder = await initializeTestProject()
@@ -51,13 +45,3 @@ test('generateInstallPackageCommands only creates command for an env if it is re
   ])
   t.deepEqual(installPackageCommands, ['yarn add --dev ava'])
 })
-
-async function initializeTestProject() {
-  const tempTestFolder = path.join(
-    osTmpdir(),
-    `booomstrapper_test_temp_dir_${Math.random()}`
-  )
-  createEmptyFolder(tempTestFolder)
-  await initializeProject(tempTestFolder, 'plain-node')
-  return tempTestFolder
-}

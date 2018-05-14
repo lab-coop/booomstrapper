@@ -1,11 +1,11 @@
 /** @module Hooks */
 
-import fs from 'fs'
+import fs from 'fs-extra'
 import _ from 'lodash'
 import path from 'path'
-import fsPath from 'fs-path'
 
 import Logger from '../Logger'
+import { installPackages, addScript } from '../JsProjectHandler'
 
 const HOOK_DIR = './scripts/hooks'
 const supportedHooks = ['pre-commit']
@@ -36,7 +36,7 @@ function readHooks() {
   let hooksToAdd = fs.readdirSync(HOOK_DIR)
   const notUsedFilenames = _.difference(hooksToAdd, supportedHooks)
   const usedFilenames = _.difference(hooksToAdd, notUsedFilenames)
-  Logger.warn(
+  Logger.debug(
     `Ignoring the following hooks, as they are not supported: ${notUsedFilenames}`
   )
   const usedDirectories = usedFilenames.filter(filename =>
@@ -83,16 +83,26 @@ function filterHookScriptsToInclude(hooks, filters) {
  * @param {string} repoLocation
  */
 function createHookFiles(scriptsToIncludeByHookType, repoLocation) {
+  fs.ensureDirSync(path.join(repoLocation, '.githooks'))
   Object.keys(scriptsToIncludeByHookType).forEach(hookType => {
-    fsPath.writeFile(
-      path.join(repoLocation, '.git', 'hooks', hookType),
+    fs.writeFileSync(
+      path.join(repoLocation, '.githooks', hookType),
       scriptsToIncludeByHookType[hookType].join('\n\n')
     )
+  })
+}
+
+async function addHuskyHooks(scriptsToIncludeByHookType, repositoryPath) {
+  await installPackages(repositoryPath, [{ name: 'husky', env: 'dev' }])
+  await addScript(repositoryPath, {
+    name: 'precommit',
+    command: 'bash .githooks/pre-commit'
   })
 }
 
 module.exports = {
   readHooks,
   filterHookScriptsToInclude,
-  createHookFiles
+  createHookFiles,
+  addHuskyHooks
 }

@@ -69,6 +69,18 @@ var projectCreationParametersQuestions = [
     }
   },
   {
+    type: 'checkbox',
+    name: 'hooks',
+    message: 'Which hooks do you want to be installed?',
+    choices: [
+      {
+        name: 'pre-commit/check-angular-commit-messages',
+        short: 'angular',
+        value: 'pre-commit/check-angular-commit-messages'
+      }
+    ]
+  },
+  {
     type: 'list',
     message: 'What type of project should be created?',
     name: 'projectType',
@@ -156,13 +168,16 @@ async function createRepository() {
     'Adding default readme'
   )
   addSequenceItem(
-    () => GitHandler.addDefaultGitIgnore(GitHandler.repoLocation),
+    () => GitHandler.addDefaultGitIgnore(GitHandler.getRepositoryPath()),
     'Adding default gitignore'
   )
-  // todo: should be optional, selectable via a list
   addSequenceItem(
-    () => GitHandler.addDefaultHooks(),
-    'Adding default git hooks'
+    () =>
+      GitHandler.addHooks(
+        repositoryDetails.hooks,
+        GitHandler.getRepositoryPath()
+      ),
+    'Adding git hooks'
   )
   addSequenceItem(
     () => GitHandler.createCommit('Initial commit'),
