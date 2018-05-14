@@ -7,6 +7,9 @@ import ReadmeHandler from './ReadmeHandler'
 import { initializeProject, installPackages } from './JsProjectHandler'
 
 import { addSequenceItem, runSequence } from './SequenceRunner'
+import { getHooks } from './GitHandler/Hooks'
+
+const HOOKS = getHooks()
 
 var projectCreationParametersQuestions = [
   {
@@ -72,13 +75,10 @@ var projectCreationParametersQuestions = [
     type: 'checkbox',
     name: 'hooks',
     message: 'Which hooks do you want to be installed?',
-    choices: [
-      {
-        name: 'pre-commit/check-angular-commit-messages',
-        short: 'angular',
-        value: 'pre-commit/check-angular-commit-messages'
-      }
-    ]
+    choices: HOOKS.map(hook => ({
+      name: hook.ruleName,
+      value: hook
+    }))
   },
   {
     type: 'list',

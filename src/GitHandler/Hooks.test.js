@@ -15,7 +15,7 @@ const filterHookScriptsToInclude = HooksModule.__get__(
 )
 
 const angularSettings = {
-  ruleName: 'angular',
+  ruleName: 'angular---test',
   execute: 'validate-commit-msg',
   dependencies: ['validate-commit'],
   hookType: 'commitmsg'
@@ -33,7 +33,11 @@ test.serial('getHooks return list of valid hooks', t => {
   fs.outputFileSync(hookFilePath, hookFile.content)
 
   const hooks = getHooks()
-  t.deepEqual(hooks, [angularSettings])
+
+  t.deepEqual(
+    hooks.filter(hook => hook.ruleName === angularSettings.ruleName),
+    [angularSettings]
+  )
 
   fs.removeSync(hookFilePath)
 })
