@@ -1,108 +1,65 @@
 /** @module Hooks */
 
 import fs from 'fs-extra'
-import _ from 'lodash'
 import path from 'path'
 
-import Logger from '../Logger'
 import { installPackages, addScript } from '../JsProjectHandler'
 
-const HOOK_DIR = './scripts/hooks'
-const supportedHooks = ['pre-commit']
+const HOOK_DIR = '../../scripts/hooks'
 
 /**
  * Hook parsed from filesytem
  * @typedef {Object} ParsedHook
  * @property {string} ruleName - name of the rule in the filesystem
- * @property {string} script - script to execute if that rule is included
+ * @property {string} execute - script to execute if that rule is included
+ * @property {string[]} dependencies - dev dependecies needed for the hook
+ * @property {string} hookType - type of the hook (eg. pre-commit)
  */
-
-/**
- * Hooks parsed from filesytem
- * @typedef {Object.<string, Object.<string, ParsedHook>>} ParsedHooks
- *                  |- hook type    |- hook name
- */
-
-function isDirectory(path) {
-  return fs.lstatSync(path).isDirectory()
-}
 
 /**
  * reads the hooks from HOOK_DIR
- * @return {ParsedHooks}
+ * @return {ParsedHook[]}
  */
 function readHooks() {
-  const result = {}
-  let hooksToAdd = fs.readdirSync(HOOK_DIR)
-  const notUsedFilenames = _.difference(hooksToAdd, supportedHooks)
-  const usedFilenames = _.difference(hooksToAdd, notUsedFilenames)
-  Logger.debug(
-    `Ignoring the following hooks, as they are not supported: ${notUsedFilenames}`
-  )
-  const usedDirectories = usedFilenames.filter(filename =>
-    isDirectory(`${HOOK_DIR}/${filename}`)
-  )
-  usedDirectories.forEach(directoryName => {
-    const directoryPath = `${HOOK_DIR}/${directoryName}`
-    result[directoryName] = {}
-    fs.readdirSync(directoryPath).forEach(hookFilename => {
-      const name = hookFilename.replace(/\.sample$/, '')
-      result[directoryName][name] = {
-        ruleName: name,
-        script: fs.readFileSync(`${directoryPath}/${hookFilename}`, {
-          encoding: 'utf8'
-        })
-      }
-    })
-  })
-  return result
+  let hooksToAdd = fs.readdirSync(path.join(__dirname, HOOK_DIR))
+  return hooksToAdd
+    .filter(hookPath => hookPath.endsWith('.js'))
+    .map(hookPath => require(`${HOOK_DIR}/${hookPath}`))
 }
 
 /**
  * Returns the filtered available rules grouped by hook type
- * @param {ParsedHooks} hooks
+ * @param {ParsedHook[]} hooks
  * @param {string[]} filters
  */
 function filterHookScriptsToInclude(hooks, filters) {
-  const scriptsToIncludeByHookType = {}
-  filters.forEach(filter => {
-    const [hookType, ruleName] = filter.split('/')
-    scriptsToIncludeByHookType[hookType] =
-      scriptsToIncludeByHookType[hookType] || []
-    const scriptToInclude = _.get(hooks, `${hookType}.${ruleName}.script`)
-    if (scriptToInclude) {
-      scriptsToIncludeByHookType[hookType].push(scriptToInclude)
-    }
-  })
-  return scriptsToIncludeByHookType
+  return hooks.filter(hook => filters.indexOf(hook.ruleName) !== -1)
 }
 
 /**
- * Unifies hooks of the same type (eg. pre-commit) and writes them to files
- * @param {Object.<string, string[]>} scriptsToIncludeByHookType
- * @param {string} repoLocation
+ * @param {ParsedHook[]} scriptsToInclude
+ * @param {string} repositoryPath
  */
-function createHookFiles(scriptsToIncludeByHookType, repoLocation) {
-  fs.ensureDirSync(path.join(repoLocation, '.githooks'))
-  Object.keys(scriptsToIncludeByHookType).forEach(hookType => {
-    fs.writeFileSync(
-      path.join(repoLocation, '.githooks', hookType),
-      scriptsToIncludeByHookType[hookType].join('\n\n')
-    )
-  })
+async function addHuskyHooks(scriptsToInclude, repositoryPath) {
+  await installPackages(repositoryPath, [{ name: 'husky', env: 'dev' }])
+  for (let i = 0; i < scriptsToInclude.length; i++) {
+    await addScript(repositoryPath, {
+      name: scriptsToInclude[i].hookType,
+      command: scriptsToInclude[i].execute
+    })
+  }
 }
 
-async function addHuskyHooks(scriptsToIncludeByHookType, repositoryPath) {
-  await installPackages(repositoryPath, [{ name: 'husky', env: 'dev' }])
-  await addScript(repositoryPath, {
-    name: 'precommit',
-    command: 'bash .githooks/pre-commit'
-  })
+/**
+ * @param {string[]} filters
+ * @param {string} repositoryPath
+ */
+async function addHooks(filters, repositoryPath) {
+  const hooks = readHooks()
+  const scriptsToInclude = filterHookScriptsToInclude(hooks, filters)
+  await addHuskyHooks(scriptsToInclude, repositoryPath)
 }
 
 module.exports = {
-  readHooks,
-  filterHookScriptsToInclude,
-  createHookFiles,
-  addHuskyHooks
+  addHooks
 }

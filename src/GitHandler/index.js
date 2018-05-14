@@ -7,12 +7,7 @@ import path from 'path'
 
 import Logger from '../Logger'
 import { createEmptyFolder } from '../utils/SystemUtils'
-import {
-  readHooks,
-  createHookFiles,
-  filterHookScriptsToInclude,
-  addHuskyHooks
-} from './Hooks'
+import { addHooks } from './Hooks'
 
 var repoLocation
 const tempFolder = path.join(osTmpdir(), 'booomstrapper_temp_dir')
@@ -73,13 +68,6 @@ function addDefaultHooks() {
       path.join(repoLocation, '.git', 'hooks', hook.replace('.sample', ''))
     )
   })
-}
-
-async function addHooks(filters, repositoryPath) {
-  const hooks = readHooks()
-  const scriptsToIncludeByHookType = filterHookScriptsToInclude(hooks, filters)
-  createHookFiles(scriptsToIncludeByHookType, repositoryPath)
-  await addHuskyHooks(undefined, repositoryPath)
 }
 
 function addDefaultGitIgnore() {

@@ -9,7 +9,7 @@
   },
   "scripts": {
     "lint": "eslint src",
-    "test": "ava  src/*.test.js src/**/*.test.js",
+    "test": "ava  src/*.test.js src/**/*.test.js !scripts/**/*",
     "babel:build": "babel src -d lib",
     "babel:watch": "babel src -d lib -w"
   },
@@ -53,7 +53,8 @@
     "eslint-plugin-promise": "^3.7.0",
     "eslint-plugin-standard": "^3.1.0",
     "mock-fs": "^4.5.0",
-    "prettier": "^1.12.1"
+    "prettier": "^1.12.1",
+    "rewire": "^4.0.1"
   },
   "ava": {
     "require": [
