@@ -24,10 +24,7 @@ async function initializeTestProject() {
  * @returns {boolean}
  */
 function projectHasDependencies(repositoryPath, dependencyList) {
-  const { pkg } = readPkgUp.sync({
-    cwd: repositoryPath,
-    normalize: false
-  })
+  const pkg = getPkgContent(repositoryPath)
   const envToPackageJSONKey = {
     prod: 'dependencies',
     dev: 'devDependencies'
@@ -39,7 +36,18 @@ function projectHasDependencies(repositoryPath, dependencyList) {
     .every(b => b)
 }
 
+/**
+ * @param {string} repositoryPath
+ */
+function getPkgContent(repositoryPath) {
+  return readPkgUp.sync({
+    cwd: repositoryPath,
+    normalize: false
+  }).pkg
+}
+
 module.exports = {
   initializeTestProject,
-  projectHasDependencies
+  projectHasDependencies,
+  getPkgContent
 }

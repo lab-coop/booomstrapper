@@ -1,23 +1,18 @@
 import test from 'ava'
 import path from 'path'
 import fs from 'fs-extra'
-import rewire from 'rewire'
 
 import {
   initializeTestProject,
-  projectHasDependencies
+  projectHasDependencies,
+  getPkgContent
 } from '../utils/TestUtils'
 import { addHooks, getHooks } from './Hooks'
-
-const HooksModule = rewire('./Hooks')
-const filterHookScriptsToInclude = HooksModule.__get__(
-  'filterHookScriptsToInclude'
-)
 
 const HOOK_FOLDER_PATH = path.join(__dirname, '../../scripts/hooks/')
 const TEST_HOOK_PATH = `${HOOK_FOLDER_PATH}/pre-commit-test.js`
 const TEST_HOOK_CONTENT = {
-  ruleName: 'angular',
+  ruleName: 'angular----test',
   execute: 'validate-commit-msg',
   dependencies: ['validate-commit'],
   hookType: 'commitmsg'
@@ -40,33 +35,36 @@ test.serial('getHooks return list of valid hooks', t => {
   fs.removeSync(TEST_HOOK_PATH)
 })
 
-test('filterHookScriptsToInclude returns the correct hooks files based on hooks and settings', t => {
-  const anOtherHook = {
-    ...TEST_HOOK_CONTENT,
-    ruleName: 'anOtherHook'
-  }
-  const hooks = [TEST_HOOK_CONTENT, anOtherHook]
-  const filter = [TEST_HOOK_CONTENT.ruleName]
-  t.deepEqual(filterHookScriptsToInclude(hooks, filter), [TEST_HOOK_CONTENT])
-})
-
 // Integration test
 
 test.serial(
-  'add hooks should create a .githooks directory and uptade package.json',
+  'add hooks should create uptade package.json with commands and dependecies',
   async t => {
     const testProjectPath = await initializeTestProject()
     fs.outputFileSync(TEST_HOOK_PATH, TEST_HOOK_FILE_CONTENT)
-    await addHooks(['pre-commit-test'], testProjectPath)
+    await addHooks([TEST_HOOK_CONTENT], testProjectPath)
 
-    const hasRequiredDependencies = projectHasDependencies(testProjectPath, [
-      { name: 'husky', env: 'dev' }
-    ])
+    const requiredDependencies = [
+      { name: 'husky', env: 'dev' },
+      ...TEST_HOOK_CONTENT.dependencies.map(dep => ({ name: dep, env: 'dev' }))
+    ]
+    const hasRequiredDependencies = projectHasDependencies(
+      testProjectPath,
+      requiredDependencies
+    )
     t.true(
       hasRequiredDependencies,
-      `Project has not the required dependencies ${JSON.stringify([
-        { name: 'husky', env: 'dev' }
-      ])}`
+      `Project has not the required dependencies ${JSON.stringify(
+        requiredDependencies
+      )}`
+    )
+
+    const packageScripts = getPkgContent(testProjectPath).scripts
+    t.true(TEST_HOOK_CONTENT.hookType in packageScripts)
+    t.true(
+      packageScripts[TEST_HOOK_CONTENT.hookType].includes(
+        TEST_HOOK_CONTENT.execute
+      )
     )
 
     fs.removeSync(TEST_HOOK_PATH)

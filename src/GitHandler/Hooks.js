@@ -28,20 +28,18 @@ function getHooks() {
 }
 
 /**
- * Returns the filtered available rules grouped by hook type
- * @param {ParsedHook[]} hooks
- * @param {string[]} filters
- */
-function filterHookScriptsToInclude(hooks, filters) {
-  return hooks.filter(hook => filters.indexOf(hook.ruleName) !== -1)
-}
-
-/**
  * @param {ParsedHook[]} scriptsToInclude
  * @param {string} repositoryPath
  */
 async function addHuskyHooks(scriptsToInclude, repositoryPath) {
-  await installPackages(repositoryPath, [{ name: 'husky', env: 'dev' }])
+  const packagesToInstall = scriptsToInclude.reduce(
+    (acc, scriptInfo) => (acc = [...acc, ...scriptInfo.dependencies]),
+    ['husky']
+  )
+  await installPackages(
+    repositoryPath,
+    packagesToInstall.map(packageName => ({ name: packageName, env: 'dev' }))
+  )
   for (let i = 0; i < scriptsToInclude.length; i++) {
     await addScript(repositoryPath, {
       name: scriptsToInclude[i].hookType,
@@ -51,13 +49,11 @@ async function addHuskyHooks(scriptsToInclude, repositoryPath) {
 }
 
 /**
- * @param {string[]} filters
+ * @param {ParsedHook[]} hooks
  * @param {string} repositoryPath
  */
-async function addHooks(filters, repositoryPath) {
-  const hooks = getHooks()
-  const scriptsToInclude = filterHookScriptsToInclude(hooks, filters)
-  await addHuskyHooks(scriptsToInclude, repositoryPath)
+async function addHooks(hooks, repositoryPath) {
+  await addHuskyHooks(hooks, repositoryPath)
 }
 
 module.exports = {
