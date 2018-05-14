@@ -40,7 +40,9 @@ async function createTag(tagName) {
 }
 async function createCommit(message = '') {
   await simpleGit(repoLocation).add('./*')
-  return simpleGit(repoLocation).commit(message)
+  return simpleGit(repoLocation).commit(message, undefined, {
+    '--no-verify': undefined
+  })
 }
 
 async function revertRepository(hard = true) {
