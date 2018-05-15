@@ -18,13 +18,37 @@ async function initializeProject(repositoryPath, projectType) {
   }
 }
 
+/**
+ * @param {{name: string, env?: string}[]} packages
+ * @private
+ */
+function _generateInstallPackageCommands(packages) {
+  const devPackages = packages.filter(pckg => pckg.env === 'dev')
+  const prodPackages = _.difference(packages, devPackages)
+  let res = []
+  if (devPackages.length > 0)
+    res.push(`yarn add --dev ${devPackages.map(p => p.name).join(' ')}`)
+  if (prodPackages.length > 0)
+    res.push(`yarn add ${prodPackages.map(p => p.name).join(' ')}`)
+  return res
+}
+
+/**
+ * @param {string} repositoryPath
+ * @param {{name: string, env?: string}[]} packages packages
+ */
 async function installPackages(repositoryPath, packages) {
   return new Promise(async (resolve, reject) => {
     try {
-      const packageNames = packages.join(' ')
-      await runCommand(`yarn add ${packageNames}`, false, repositoryPath)
+      const installCommands = _generateInstallPackageCommands(packages)
+      await Promise.all(
+        installCommands.map(installCommand =>
+          runCommand(installCommand, false, repositoryPath)
+        )
+      )
+      const packageNames = packages.map(npmPackage => npmPackage.name)
       const availableConfigs = _.intersection(
-        packages,
+        packageNames,
         Object.keys(defaultConfigs)
       )
       availableConfigs.forEach(config => {
@@ -42,5 +66,6 @@ async function installPackages(repositoryPath, packages) {
 
 module.exports = {
   installPackages,
-  initializeProject
+  initializeProject,
+  _generateInstallPackageCommands
 }
