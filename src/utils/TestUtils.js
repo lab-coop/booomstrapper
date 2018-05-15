@@ -19,6 +19,7 @@ async function initializeTestProject() {
 }
 
 /**
+ * returns true if the project has all the dependencies listed in dependencyList
  * @param {string} repositoryPath
  * @param {{name: string, env: ('prod'|'dev')}[]} dependencyList
  * @returns {boolean}
@@ -33,7 +34,7 @@ function projectHasDependencies(repositoryPath, dependencyList) {
     .map(
       dependency => dependency.name in pkg[envToPackageJSONKey[dependency.env]]
     )
-    .every(b => b)
+    .every(isDependencyInPackage => isDependencyInPackage)
 }
 
 /**
