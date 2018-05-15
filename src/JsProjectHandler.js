@@ -23,33 +23,14 @@ async function initializeProject(repositoryPath, projectType) {
  * @private
  */
 function _generateInstallPackageCommands(packages) {
-  const packagesByEnv = []
-  const envIndexInList = {}
-  packages.forEach(npmPackage => {
-    const env = npmPackage.env === 'dev' ? 'dev' : 'prod'
-    if (!(env in envIndexInList)) {
-      envIndexInList[env] = packagesByEnv.push({ packageNames: [], env }) - 1
-    }
-    packagesByEnv[envIndexInList[env]].packageNames.push(npmPackage.name)
-  })
-  return _assembleInstallCommands(packagesByEnv)
-}
-
-function _assembleInstallCommand(packageNames, env) {
-  if (packageNames.length === 0) return
-  return `yarn add${env === 'dev' ? ' --dev' : ''} ${packageNames.join(' ')}`
-}
-
-/**
- * @param {{packageNames: string[], env?: string}[]} packagesByEnv
- */
-function _assembleInstallCommands(packagesByEnv) {
-  const commands = packagesByEnv
-    .map(packages =>
-      _assembleInstallCommand(packages.packageNames, packages.env)
-    )
-    .filter(command => command)
-  return commands
+  const devPackages = packages.filter(pckg => pckg.env === 'dev')
+  const prodPackages = _.difference(packages, devPackages)
+  let res = []
+  if (devPackages.length > 0)
+    res.push(`yarn add --dev ${devPackages.map(p => p.name).join(' ')}`)
+  if (prodPackages.length > 0)
+    res.push(`yarn add ${prodPackages.map(p => p.name).join(' ')}`)
+  return res
 }
 
 /**
