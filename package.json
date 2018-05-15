@@ -10,7 +10,8 @@
   "scripts": {
     "precommit": "lint-staged",
     "lint": "eslint src",
-    "test": "nyc --all ava",
+    "test": "ava",
+    "testWithCoverage": "nyc --all ava",
     "babel:build": "babel src -d lib",
     "babel:watch": "babel src -d lib -w"
   },
