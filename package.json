@@ -9,9 +9,10 @@
   },
   "scripts": {
     "lint": "eslint src",
-    "test": "ava src/**/*.test.js",
-    "babel:build": "babel src -d lib",
-    "babel:watch": "babel src -d lib -w"
+    "test": "ava",
+    "testWithCoverage": "nyc --all ava",
+    "babel:build": "babel src -d lib --delete-dir-on-start",
+    "babel:watch": "babel src -d lib --delete-dir-on-start -w"
   },
   "author": "csaba.makara@booom.studio",
   "license": "MIT",
@@ -19,6 +20,30 @@
     "src/**/*.{js,json}": [
       "prettier --single-quote --write",
       "git add"
+    ]
+  },
+  "nyc": {
+    "check-coverage": true,
+    "lines": 3,
+    "statements": 6,
+    "functions": 5,
+    "include": [
+      "src/**/*.js"
+    ],
+    "exclude": [
+      "src/**/*.test.js"
+    ],
+    "all": true
+  },
+  "ava": {
+    "files": [
+			"src/**/*.test.js"
+		],
+    "sources": [
+      "src/**/*.js"
+    ],
+    "require": [
+      "@babel/register"
     ]
   },
   "dependencies": {
@@ -50,11 +75,7 @@
     "eslint-plugin-node": "^6.0.1",
     "eslint-plugin-promise": "^3.7.0",
     "eslint-plugin-standard": "^3.1.0",
+    "nyc": "^11.7.3",
     "prettier": "^1.12.1"
-  },
-  "ava": {
-    "require": [
-      "@babel/register"
-    ]
   }
 }
