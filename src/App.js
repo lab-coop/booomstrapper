@@ -22,6 +22,10 @@ program.command('init-repository').action(async () => {
   await createRepository()
 })
 
+program.command('reset-authentication').action(async () => {
+  await GithubHandler.resetAuthInfo()
+})
+
 async function prepareRun() {
   Config.initializeConfig()
   await GithubHandler.checkAuthInfo()
