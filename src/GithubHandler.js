@@ -32,7 +32,8 @@ var tokenQuestion = [
   {
     type: 'password',
     name: 'oauthToken',
-    message: 'Please provide your oAuth token',
+    message: `Please provide your oAuth token
+🔑 https://github.com/settings/tokens`,
     default: function() {
       return null
     }
