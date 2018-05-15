@@ -61,3 +61,6 @@ typings/
 .coverage
 .vscode
 lib
+
+.nyc_output
+coverage
