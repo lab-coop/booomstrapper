@@ -8,12 +8,11 @@
     "booom": "./lib/App.js"
   },
   "scripts": {
-    "precommit": "lint-staged",
     "lint": "eslint src",
     "test": "ava",
     "testWithCoverage": "nyc --all ava",
-    "babel:build": "babel src -d lib",
-    "babel:watch": "babel src -d lib -w"
+    "babel:build": "babel src -d lib --delete-dir-on-start",
+    "babel:watch": "babel src -d lib --delete-dir-on-start -w"
   },
   "author": "csaba.makara@booom.studio",
   "license": "MIT",
