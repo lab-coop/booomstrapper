@@ -8,7 +8,6 @@
     "booom": "./lib/App.js"
   },
   "scripts": {
-    "precommit": "lint-staged",
     "lint": "eslint src",
     "test": "ava src/**/*.test.js",
     "babel:build": "babel src -d lib",
