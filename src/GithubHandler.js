@@ -116,5 +116,6 @@ module.exports = {
   createRepository,
   listRepositories,
   protectBranch,
-  checkAuthInfo
+  checkAuthInfo,
+  resetAuthInfo
 }
