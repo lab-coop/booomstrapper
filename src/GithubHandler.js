@@ -84,7 +84,9 @@ async function listRepositories(org, type = 'public') {
 async function checkAuthInfo() {
   var authInfo = Config.get('github.auth')
   if (!authInfo) {
-    Logger.info('Github authentication info is missing. Please provide them.\n')
+    Logger.info(
+      '⚠️  Github authentication info is missing. Please provide them.\n'
+    )
     const type = (await inquirer.prompt(authMethodSelection)).authMethod
     const token = (await inquirer.prompt(tokenQuestion)).oauthToken
     authInfo = {
@@ -93,7 +95,21 @@ async function checkAuthInfo() {
     }
     Config.set('github.auth', authInfo)
   }
-  octo.authenticate(Config.get('github.auth'))
+  try {
+    octo.authenticate(Config.get('github.auth'))
+    await octo.users.getKeys()
+  } catch (err) {
+    if (err.code === 401 || !Config.get('github.auth').token) {
+      Logger.info('🚫 Github authentication info is not correct.')
+      resetAuthInfo()
+      await checkAuthInfo()
+    }
+  }
+  Logger.info('👊 Your Github authentication info is correct!\n')
+}
+
+function resetAuthInfo() {
+  Config.set('github.auth', '', true)
 }
 
 module.exports = {
