@@ -15,7 +15,7 @@ async function runSequence() {
   for (let sequenceItem of sequenceItems) {
     if (!(await run(sequenceItem.command, sequenceItem.text))) {
       clearSequence()
-      return
+      throw new Error('failed to run sequence')
     }
   }
   clearSequence()
