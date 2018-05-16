@@ -8,6 +8,9 @@ import ConfigHandler from './ConfigHandler'
 import { initializeProject, installPackages } from './JsProjectHandler'
 
 import { addSequenceItem, runSequence } from './SequenceRunner'
+import { getHooks } from './GitHandler/Hooks'
+
+const HOOKS = getHooks()
 
 var projectCreationParametersQuestions = [
   {
@@ -68,6 +71,15 @@ var projectCreationParametersQuestions = [
     default: function() {
       return true
     }
+  },
+  {
+    type: 'checkbox',
+    name: 'hooks',
+    message: 'Which hooks do you want to be installed?',
+    choices: HOOKS.map(hook => ({
+      name: hook.ruleName,
+      value: hook
+    }))
   },
   {
     type: 'list',
@@ -180,8 +192,12 @@ async function createRepository() {
   }
   // todo: should be optional, selectable via a list
   addSequenceItem(
-    () => GitHandler.addDefaultHooks(),
-    'Adding default git hooks'
+    () =>
+      GitHandler.addHooks(
+        repositoryDetails.hooks,
+        GitHandler.getRepositoryPath()
+      ),
+    'Adding git hooks'
   )
   addSequenceItem(
     () => GitHandler.createCommit('Initial commit'),
@@ -210,14 +226,14 @@ async function createRepository() {
       repositoryDetails.repositoryName
     )
     Logger.info(`
-  
+
 💣 💣 💣 💣 💣 BOOOM 💣 💣 💣 💣 💣
 
 Repository successfully created!
 
   Clone using SSH:        ${repoInfo.ssh_url}
   Clone using HTTP:       ${repoInfo.clone_url}
-  
+
   `)
   } catch {
     // do nothing
