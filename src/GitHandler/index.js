@@ -62,23 +62,6 @@ async function addRemote(remoteName, remotePath) {
   return simpleGit(repoLocation).addRemote(remoteName, remotePath)
 }
 
-function addDefaultHooks() {
-  const hooks = fs.readdirSync('./scripts/hooks/')
-  hooks.forEach(hook => {
-    fs.copyFileSync(
-      path.join('.', 'scripts', 'hooks', hook),
-      path.join(repoLocation, '.git', 'hooks', hook.replace('.sample', ''))
-    )
-  })
-}
-
-function addDefaultGitIgnore() {
-  fs.copyFileSync(
-    path.join('.', 'scripts', 'misc', '.gitignore'),
-    path.join(repoLocation, '.gitignore')
-  )
-}
-
 module.exports = {
   addRemote,
   createBranch,
@@ -90,9 +73,7 @@ module.exports = {
   pushBranch,
   pushToRemote,
   getCurrentBranch,
-  addDefaultHooks,
   addHooks,
-  addDefaultGitIgnore,
   setRepositoryPath,
   getRepositoryPath
 }
