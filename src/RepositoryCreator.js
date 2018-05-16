@@ -72,15 +72,6 @@ var projectCreationParametersQuestions = [
     }
   },
   {
-    type: 'checkbox',
-    name: 'hooks',
-    message: 'Which hooks do you want to be installed?',
-    choices: HOOKS.map(hook => ({
-      name: hook.ruleName,
-      value: hook
-    }))
-  },
-  {
     type: 'list',
     message: 'What type of project should be created?',
     name: 'projectType',
@@ -91,6 +82,15 @@ var projectCreationParametersQuestions = [
       }
       return true
     }
+  },
+  {
+    type: 'checkbox',
+    name: 'hooks',
+    message: 'Which hooks do you want to be installed?',
+    choices: HOOKS.map(hook => ({
+      name: hook.ruleName,
+      value: hook
+    }))
   },
   {
     type: 'checkbox',

@@ -2,7 +2,6 @@
 
 import simpleGit from 'simple-git/promise'
 import osTmpdir from 'os-tmpdir'
-import fs from 'fs'
 import path from 'path'
 
 import Logger from '../Logger'
