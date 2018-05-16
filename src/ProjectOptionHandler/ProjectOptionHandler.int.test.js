@@ -28,7 +28,7 @@ test.afterEach(t => {
 })
 
 test.serial(
-  'enableProjectOptions should add required dependecies to package.json',
+  'enableProjectOptions should add required dependencies to package.json',
   async t => {
     const requiredDependencies = [
       { name: 'husky', env: 'dev' },
