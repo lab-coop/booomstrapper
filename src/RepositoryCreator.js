@@ -109,8 +109,8 @@ var projectCreationParametersQuestions = [
   }
 ]
 
-async function createRepository(cmd) {
-  if (cmd.localRepoOnly) {
+async function createRepository(options) {
+  if (options.localRepoOnly) {
     projectCreationParametersQuestions = projectCreationParametersQuestions.filter(
       question => question.scope !== 'remote'
     )
@@ -121,7 +121,7 @@ async function createRepository(cmd) {
   GitHandler.setRepositoryPath(
     path.join(GitHandler.getRepositoryPath(), repositoryDetails.repositoryName)
   )
-  if (!cmd.localRepoOnly) {
+  if (!options.localRepoOnly) {
     addSequenceItem(
       () =>
         GithubHandler.createRepository(
@@ -140,7 +140,7 @@ async function createRepository(cmd) {
     () => GitHandler.createBranch(repositoryDetails.defaultBranchName),
     `Creating default branch: ${repositoryDetails.defaultBranchName}`
   )
-  if (!cmd.localRepoOnly) {
+  if (!options.localRepoOnly) {
     addSequenceItem(
       () =>
         GitHandler.addRemote(
@@ -199,13 +199,13 @@ async function createRepository(cmd) {
     () => GitHandler.createCommit('Initial commit'),
     'Creating initial commit'
   )
-  if (!cmd.localRepoOnly) {
+  if (!options.localRepoOnly) {
     addSequenceItem(
       () => GitHandler.pushBranch(repositoryDetails.defaultBranchName),
       'Pushing branch to remote'
     )
   }
-  if (!cmd.localRepoOnly && repositoryDetails.isDefaultBranchProtected) {
+  if (!options.localRepoOnly && repositoryDetails.isDefaultBranchProtected) {
     addSequenceItem(
       () =>
         GithubHandler.protectBranch(
@@ -220,7 +220,7 @@ async function createRepository(cmd) {
   try {
     await runSequence()
     let successMessage = ''
-    if (cmd.localRepoOnly) {
+    if (options.localRepoOnly) {
       successMessage = `
   Local path:        ${GitHandler.getRepositoryPath()}
       `

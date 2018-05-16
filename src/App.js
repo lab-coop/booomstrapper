@@ -22,7 +22,7 @@ program
   .command('init-repository')
   .option('-l, --local-repo-only', 'Does not create the remote repository')
   .action(async cmd => {
-    await createRepository(cmd)
+    await createRepository({ localRepoOnly: cmd.localRepoOnly })
   })
 
 program.command('reset-authentication').action(async () => {
