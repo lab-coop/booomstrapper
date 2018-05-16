@@ -3,7 +3,8 @@ import path from 'path'
 
 import GitHandler from './GitHandler'
 import GithubHandler from './GithubHandler'
-import ReadmeHandler from './ReadmeHandler'
+import Logger from './Logger'
+import ConfigHandler from './ConfigHandler'
 import { initializeProject, installPackages } from './JsProjectHandler'
 
 import { addSequenceItem, runSequence } from './SequenceRunner'
@@ -104,6 +105,16 @@ var projectCreationParametersQuestions = [
       },
       { name: 'eslint', value: { name: 'eslint', env: 'dev' }, checked: true }
     ]
+  },
+  {
+    type: 'checkbox',
+    message: 'Which default config file should be added?',
+    name: 'configsToAdd',
+    choices: [
+      { name: 'dockerignore', checked: true },
+      { name: 'npmignore', checked: true },
+      { name: 'gitignore', checked: true }
+    ]
   }
 ]
 
@@ -161,16 +172,25 @@ async function createRepository() {
   }
   addSequenceItem(
     () =>
-      ReadmeHandler.addDefault(
+      ConfigHandler.addDefaultReadme(
         GitHandler.getRepositoryPath(),
         repositoryDetails.repositoryName
       ),
     'Adding default readme'
   )
-  addSequenceItem(
-    () => GitHandler.addDefaultGitIgnore(GitHandler.getRepositoryPath()),
-    'Adding default gitignore'
-  )
+  if (repositoryDetails.configsToAdd) {
+    addSequenceItem(
+      () =>
+        ConfigHandler.addDefaultConfigs(
+          GitHandler.getRepositoryPath(),
+          repositoryDetails.configsToAdd
+        ),
+      `Adding default configuration files: ${repositoryDetails.configsToAdd.join(
+        ', '
+      )}`
+    )
+  }
+  // todo: should be optional, selectable via a list
   addSequenceItem(
     () =>
       GitHandler.addHooks(
@@ -198,7 +218,26 @@ async function createRepository() {
       `Protecting default branch: ${repositoryDetails.defaultBranchName}`
     )
   }
-  runSequence()
+
+  try {
+    await runSequence()
+    const { data: repoInfo } = await GithubHandler.getRemoteRepositoryInfo(
+      repositoryDetails.githubOrganizationName,
+      repositoryDetails.repositoryName
+    )
+    Logger.info(`
+
+💣 💣 💣 💣 💣 BOOOM 💣 💣 💣 💣 💣
+
+Repository successfully created!
+
+  Clone using SSH:        ${repoInfo.ssh_url}
+  Clone using HTTP:       ${repoInfo.clone_url}
+
+  `)
+  } catch {
+    // do nothing
+  }
 }
 
 module.exports = {
