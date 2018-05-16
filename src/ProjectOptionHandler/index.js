@@ -3,6 +3,8 @@
 import fs from 'fs-extra'
 import path from 'path'
 
+import _ from 'lodash'
+
 import { addDefaultConfig } from '../ConfigHandler'
 import { installPackages, addScript } from '../JsProjectHandler'
 
@@ -34,12 +36,11 @@ function getProjectOptions(descriptorFolderPath = path.join(__dirname, DESCRIPTO
  */
 async function addHuskyHooks(scriptsToInclude, repositoryPath) {
   const packagesToInstall = scriptsToInclude.reduce(
-    (acc, scriptInfo) => (acc = [...acc, ...scriptInfo.dependencies]),
-    ['husky']
+    (acc, scriptInfo) => (acc = [...acc, ...scriptInfo.dependencies])
   )
   await installPackages(
     repositoryPath,
-    packagesToInstall.map(packageName => ({ name: packageName, env: 'dev' }))
+    _.uniq(packagesToInstall).map(packageName => ({ name: packageName, env: 'dev' }))
   )
   for (let i = 0; i < scriptsToInclude.length; i++) {
     await addScript(repositoryPath, {
