@@ -29,7 +29,7 @@ test.serial(
       () => (wasSequenceItemCalled = true),
       'This should not be called'
     )
-    await runSequence()
+    await t.throws(runSequence)
     t.false(wasSequenceItemCalled)
   }
 )

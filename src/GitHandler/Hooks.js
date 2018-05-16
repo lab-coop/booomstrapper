@@ -21,11 +21,11 @@ const HOOK_DIR = '../../scripts/hooks'
  * reads the hooks from HOOK_DIR
  * @return {ParsedHook[]}
  */
-function getHooks() {
-  let hooksToAdd = fs.readdirSync(path.join(__dirname, HOOK_DIR))
+function getHooks(hookFolderPath = path.join(__dirname, HOOK_DIR)) {
+  let hooksToAdd = fs.readdirSync(hookFolderPath)
   return hooksToAdd
     .filter(hookPath => hookPath.endsWith('.js'))
-    .map(hookPath => require(`${HOOK_DIR}/${hookPath}`))
+    .map(hookPath => require(`${hookFolderPath}/${hookPath}`))
 }
 
 /**

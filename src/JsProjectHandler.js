@@ -64,7 +64,7 @@ function addScript(repositoryPath, script) {
     normalize: false
   })
 
-  pkg.scripts = pkg.scripts ? pkg.scripts : {}
+  pkg.scripts = pkg.scripts || {}
   pkg.scripts[script.name] = pkg.scripts[script.name] || ''
   pkg.scripts[script.name] += pkg.scripts[script.name]
     ? ` && ${script.command}`

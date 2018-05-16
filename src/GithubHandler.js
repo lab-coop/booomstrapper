@@ -82,6 +82,10 @@ async function listRepositories(org, type = 'public') {
   })
 }
 
+async function getRemoteRepositoryInfo(owner, repo) {
+  return octo.repos.get({ owner, repo })
+}
+
 async function checkAuthInfo() {
   var authInfo = Config.get('github.auth')
   if (!authInfo) {
@@ -118,5 +122,6 @@ module.exports = {
   listRepositories,
   protectBranch,
   checkAuthInfo,
-  resetAuthInfo
+  resetAuthInfo,
+  getRemoteRepositoryInfo
 }

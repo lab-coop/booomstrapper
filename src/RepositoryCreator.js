@@ -5,6 +5,7 @@ import path from 'path'
 
 import GitHandler from './GitHandler'
 import GithubHandler from './GithubHandler'
+import Logger from './Logger'
 import ConfigHandler from './ConfigHandler'
 import { initializeProject } from './JsProjectHandler'
 
@@ -212,7 +213,26 @@ async function createRepository() {
       `Protecting default branch: ${repositoryDetails.defaultBranchName}`
     )
   }
-  runSequence()
+
+  try {
+    await runSequence()
+    const { data: repoInfo } = await GithubHandler.getRemoteRepositoryInfo(
+      repositoryDetails.githubOrganizationName,
+      repositoryDetails.repositoryName
+    )
+    Logger.info(`
+  
+💣 💣 💣 💣 💣 BOOOM 💣 💣 💣 💣 💣
+
+Repository successfully created!
+
+  Clone using SSH:        ${repoInfo.ssh_url}
+  Clone using HTTP:       ${repoInfo.clone_url}
+  
+  `)
+  } catch {
+    // do nothing
+  }
 }
 
 module.exports = {
