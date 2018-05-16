@@ -18,9 +18,12 @@ program.command('list-repositories <org>').action(async org => {
   })
 })
 
-program.command('init-repository').action(async () => {
-  await createRepository()
-})
+program
+  .command('init-repository')
+  .option('-l, --local-repo-only', 'Does not create the remote repository')
+  .action(async cmd => {
+    await createRepository(cmd)
+  })
 
 program.command('reset-authentication').action(async () => {
   await GithubHandler.resetAuthInfo()

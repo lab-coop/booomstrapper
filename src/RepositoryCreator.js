@@ -22,7 +22,8 @@ var projectCreationParametersQuestions = [
         return 'The organization name should not be empty.'
       }
       return true
-    }
+    },
+    scope: 'remote'
   },
   {
     type: 'input',
@@ -45,7 +46,8 @@ var projectCreationParametersQuestions = [
         return 'You must specify if the repository should be private or public.'
       }
       return true
-    }
+    },
+    scope: 'remote'
   },
   {
     type: 'input',
@@ -67,7 +69,8 @@ var projectCreationParametersQuestions = [
     message: 'Should be the default branch protected?',
     default: function() {
       return true
-    }
+    },
+    scope: 'remote'
   },
   {
     type: 'list',
@@ -106,22 +109,29 @@ var projectCreationParametersQuestions = [
   }
 ]
 
-async function createRepository() {
+async function createRepository(cmd) {
+  if (cmd.localRepoOnly) {
+    projectCreationParametersQuestions = projectCreationParametersQuestions.filter(
+      question => question.scope !== 'remote'
+    )
+  }
   const repositoryDetails = await inquirer.prompt(
     projectCreationParametersQuestions
   )
   GitHandler.setRepositoryPath(
     path.join(GitHandler.getRepositoryPath(), repositoryDetails.repositoryName)
   )
-  addSequenceItem(
-    () =>
-      GithubHandler.createRepository(
-        repositoryDetails.githubOrganizationName,
-        repositoryDetails.repositoryName,
-        repositoryDetails.publicity === 'private'
-      ),
-    'Creating Github repository'
-  )
+  if (!cmd.localRepoOnly) {
+    addSequenceItem(
+      () =>
+        GithubHandler.createRepository(
+          repositoryDetails.githubOrganizationName,
+          repositoryDetails.repositoryName,
+          repositoryDetails.publicity === 'private'
+        ),
+      'Creating Github repository'
+    )
+  }
   addSequenceItem(
     () => GitHandler.initRepository(),
     'Creating temporary local repository'
@@ -130,16 +140,18 @@ async function createRepository() {
     () => GitHandler.createBranch(repositoryDetails.defaultBranchName),
     `Creating default branch: ${repositoryDetails.defaultBranchName}`
   )
-  addSequenceItem(
-    () =>
-      GitHandler.addRemote(
-        'origin',
-        `git@github.com:${repositoryDetails.githubOrganizationName}/${
-          repositoryDetails.repositoryName
-        }.git`
-      ),
-    'Adding remote to local repository'
-  )
+  if (!cmd.localRepoOnly) {
+    addSequenceItem(
+      () =>
+        GitHandler.addRemote(
+          'origin',
+          `git@github.com:${repositoryDetails.githubOrganizationName}/${
+            repositoryDetails.repositoryName
+          }.git`
+        ),
+      'Adding remote to local repository'
+    )
+  }
   addSequenceItem(
     () =>
       initializeProject(
@@ -187,11 +199,13 @@ async function createRepository() {
     () => GitHandler.createCommit('Initial commit'),
     'Creating initial commit'
   )
-  addSequenceItem(
-    () => GitHandler.pushBranch(repositoryDetails.defaultBranchName),
-    'Pushing branch to remote'
-  )
-  if (repositoryDetails.isDefaultBranchProtected) {
+  if (!cmd.localRepoOnly) {
+    addSequenceItem(
+      () => GitHandler.pushBranch(repositoryDetails.defaultBranchName),
+      'Pushing branch to remote'
+    )
+  }
+  if (!cmd.localRepoOnly && repositoryDetails.isDefaultBranchProtected) {
     addSequenceItem(
       () =>
         GithubHandler.protectBranch(
@@ -205,19 +219,29 @@ async function createRepository() {
 
   try {
     await runSequence()
-    const { data: repoInfo } = await GithubHandler.getRemoteRepositoryInfo(
-      repositoryDetails.githubOrganizationName,
-      repositoryDetails.repositoryName
-    )
+    let successMessage = ''
+    if (cmd.localRepoOnly) {
+      successMessage = `
+  Local path:        ${GitHandler.getRepositoryPath()}
+      `
+    } else {
+      const { data: repoInfo } = await GithubHandler.getRemoteRepositoryInfo(
+        repositoryDetails.githubOrganizationName,
+        repositoryDetails.repositoryName
+      )
+      successMessage = `
+  Clone using SSH:        ${repoInfo.ssh_url}
+  Clone using HTTP:       ${repoInfo.clone_url}
+    `
+    }
+
     Logger.info(`
   
 💣 💣 💣 💣 💣 BOOOM 💣 💣 💣 💣 💣
 
 Repository successfully created!
 
-  Clone using SSH:        ${repoInfo.ssh_url}
-  Clone using HTTP:       ${repoInfo.clone_url}
-  
+${successMessage}
   `)
   } catch {
     // do nothing
