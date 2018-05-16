@@ -1,6 +1,8 @@
 import _ from 'lodash'
 import fs from 'fs'
 import path from 'path'
+import readPkgUp from 'read-pkg-up'
+import writePkg from 'write-pkg'
 
 import { runCommand } from './utils/SystemUtils'
 
@@ -64,8 +66,28 @@ async function installPackages(repositoryPath, packages) {
   })
 }
 
+/**
+ * @param {string} repositoryPath
+ * @param {{name: string, command: string}} script
+ */
+function addScript(repositoryPath, script) {
+  const { pkg, path } = readPkgUp.sync({
+    cwd: repositoryPath,
+    normalize: false
+  })
+
+  pkg.scripts = pkg.scripts || {}
+  pkg.scripts[script.name] = pkg.scripts[script.name] || ''
+  pkg.scripts[script.name] += pkg.scripts[script.name]
+    ? ` && ${script.command}`
+    : script.command
+
+  writePkg.sync(path, pkg)
+}
+
 module.exports = {
   installPackages,
   initializeProject,
+  addScript,
   _generateInstallPackageCommands
 }
