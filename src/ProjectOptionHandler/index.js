@@ -36,7 +36,7 @@ function getProjectOptions(descriptorFolderPath = path.join(__dirname, DESCRIPTO
  */
 async function addHuskyHooks(scriptsToInclude, repositoryPath) {
   const packagesToInstall = scriptsToInclude.reduce(
-    (acc, scriptInfo) => (acc = [...acc, ...scriptInfo.dependencies])
+    (acc, scriptInfo) => [...acc, ...scriptInfo.dependencies], []
   )
   await installPackages(
     repositoryPath,

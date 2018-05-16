@@ -5,7 +5,7 @@ export const TEST_DESCRIPTOR_PATH = `${DESCRIPTOR_FOLDER_PATH}/pre-commit-test.j
 export const TEST_DESCRIPTOR_CONTENT = {
   ruleName: 'angular----test',
   execute: 'validate-commit-msg',
-  dependencies: ['validate-commit'],
+  dependencies: ['husky', 'validate-commit'],
   scriptName: 'commitmsg'
 }
 
