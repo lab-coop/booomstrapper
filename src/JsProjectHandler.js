@@ -16,7 +16,11 @@ async function initializeProject(repositoryPath, projectType) {
     case 'create-react-app':
       return runCommand(`npx create-react-app ${repositoryPath}`, false)
     case 'plain-node':
-      return runCommand('npm init -y', false, repositoryPath)
+      await runCommand('npm init -y', false, repositoryPath)
+      fs.writeFileSync(
+        path.join(repositoryPath, 'index.js'),
+        'console.log("hello world")\n'
+      )
   }
 }
 

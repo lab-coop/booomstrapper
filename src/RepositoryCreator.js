@@ -41,7 +41,7 @@ var projectCreationParametersQuestions = [
     type: 'list',
     message: 'Public or private repository',
     name: 'publicity',
-    choices: [{ name: 'public' }, { name: 'private' }],
+    choices: [{ name: 'private' }, { name: 'public' }],
     validate: function(answer) {
       if (answer.length < 1) {
         return 'You must specify if the repository should be private or public.'
@@ -97,6 +97,7 @@ var projectCreationParametersQuestions = [
     message: 'Which packages should be installed?',
     name: 'packagesToInstall',
     choices: [
+      new inquirer.Separator('==Code tools=='),
       {
         name: 'prettier',
         value: { name: 'prettier', env: 'dev' },
