@@ -99,6 +99,7 @@ async function checkAuthInfo() {
   try {
     octo.authenticate(Config.get('github.auth'))
     await octo.users.getKeys()
+    Logger.info('👊 Your Github authentication info is correct!\n')
   } catch (err) {
     if (err.code === 401 || !Config.get('github.auth').token) {
       Logger.info('🚫 Github authentication info is not correct.')
@@ -106,7 +107,6 @@ async function checkAuthInfo() {
       await checkAuthInfo()
     }
   }
-  Logger.info('👊 Your Github authentication info is correct!\n')
 }
 
 function resetAuthInfo() {

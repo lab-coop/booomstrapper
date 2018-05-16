@@ -7,6 +7,9 @@ import ConfigHandler from './ConfigHandler'
 import { initializeProject, installPackages } from './JsProjectHandler'
 
 import { addSequenceItem, runSequence } from './SequenceRunner'
+import { getHooks } from './GitHandler/Hooks'
+
+const HOOKS = getHooks()
 
 var projectCreationParametersQuestions = [
   {
@@ -38,7 +41,7 @@ var projectCreationParametersQuestions = [
     type: 'list',
     message: 'Public or private repository',
     name: 'publicity',
-    choices: [{ name: 'public' }, { name: 'private' }],
+    choices: [{ name: 'private' }, { name: 'public' }],
     validate: function(answer) {
       if (answer.length < 1) {
         return 'You must specify if the repository should be private or public.'
@@ -82,9 +85,19 @@ var projectCreationParametersQuestions = [
   },
   {
     type: 'checkbox',
+    name: 'hooks',
+    message: 'Which hooks do you want to be installed?',
+    choices: HOOKS.map(hook => ({
+      name: hook.ruleName,
+      value: hook
+    }))
+  },
+  {
+    type: 'checkbox',
     message: 'Which packages should be installed?',
     name: 'packagesToInstall',
     choices: [
+      new inquirer.Separator('==Code tools=='),
       {
         name: 'prettier',
         value: { name: 'prettier', env: 'dev' },
@@ -179,8 +192,12 @@ async function createRepository() {
   }
   // todo: should be optional, selectable via a list
   addSequenceItem(
-    () => GitHandler.addDefaultHooks(),
-    'Adding default git hooks'
+    () =>
+      GitHandler.addHooks(
+        repositoryDetails.hooks,
+        GitHandler.getRepositoryPath()
+      ),
+    'Adding git hooks'
   )
   addSequenceItem(
     () => GitHandler.createCommit('Initial commit'),

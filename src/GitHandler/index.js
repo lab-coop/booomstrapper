@@ -2,11 +2,11 @@
 
 import simpleGit from 'simple-git/promise'
 import osTmpdir from 'os-tmpdir'
-import fs from 'fs'
 import path from 'path'
-import rimraf from 'rimraf'
 
-import Logger from './Logger'
+import Logger from '../Logger'
+import { createEmptyFolder } from '../utils/SystemUtils'
+import { addHooks } from './Hooks'
 
 var repoLocation
 const tempFolder = path.join(osTmpdir(), 'booomstrapper_temp_dir')
@@ -14,10 +14,7 @@ setRepositoryPath(tempFolder)
 
 function setRepositoryPath(newPath) {
   repoLocation = newPath
-  if (fs.existsSync(repoLocation)) {
-    rimraf.sync(repoLocation)
-  }
-  fs.mkdirSync(repoLocation)
+  createEmptyFolder(repoLocation)
   Logger.debug('Git repository path:', repoLocation)
 }
 
@@ -42,7 +39,9 @@ async function createTag(tagName) {
 }
 async function createCommit(message = '') {
   await simpleGit(repoLocation).add('./*')
-  return simpleGit(repoLocation).commit(message)
+  return simpleGit(repoLocation).commit(message, undefined, {
+    '--no-verify': undefined
+  })
 }
 
 async function revertRepository(hard = true) {
@@ -62,16 +61,6 @@ async function addRemote(remoteName, remotePath) {
   return simpleGit(repoLocation).addRemote(remoteName, remotePath)
 }
 
-function addDefaultHooks() {
-  const hooks = fs.readdirSync('./scripts/hooks/')
-  hooks.forEach(hook => {
-    fs.copyFileSync(
-      path.join('.', 'scripts', 'hooks', hook),
-      path.join(repoLocation, '.git', 'hooks', hook.replace('.sample', ''))
-    )
-  })
-}
-
 module.exports = {
   addRemote,
   createBranch,
@@ -83,8 +72,7 @@ module.exports = {
   pushBranch,
   pushToRemote,
   getCurrentBranch,
-  repoLocation,
-  addDefaultHooks,
+  addHooks,
   setRepositoryPath,
   getRepositoryPath
 }
