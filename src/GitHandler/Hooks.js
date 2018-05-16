@@ -48,7 +48,6 @@ async function addHuskyHooks(scriptsToInclude, repositoryPath) {
     })
 
     if (scriptsToInclude[i].config) {
-      console.log(scriptsToInclude[i].config)
       addDefaultConfig(repositoryPath, scriptsToInclude[i].config)
     }
   }
