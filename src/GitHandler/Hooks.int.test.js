@@ -9,21 +9,15 @@ import {
   getPkgContent
 } from '../utils/TestUtils'
 
-import {
-  TEST_HOOK_PATH,
-  TEST_HOOK_FILE_CONTENT,
-  TEST_HOOK_CONTENT
-} from './Hooks.test.helper.js'
+import { TEST_HOOK_CONTENT } from './Hooks.test.helper.js'
 
 test.beforeEach(async t => {
   const testProjectPath = await initializeTestProject()
-  fs.outputFileSync(TEST_HOOK_PATH, TEST_HOOK_FILE_CONTENT)
   await addHooks([TEST_HOOK_CONTENT], testProjectPath)
   t.context.testProjectPath = testProjectPath
 })
 
 test.afterEach(t => {
-  fs.removeSync(TEST_HOOK_PATH)
   fs.removeSync(t.context.testProjectPath)
 })
 
