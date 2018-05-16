@@ -1,15 +1,36 @@
+import _ from 'lodash'
+
 import inquirer from 'inquirer'
 import path from 'path'
 
 import GitHandler from './GitHandler'
 import GithubHandler from './GithubHandler'
 import ConfigHandler from './ConfigHandler'
-import { initializeProject, installPackages } from './JsProjectHandler'
+import { initializeProject } from './JsProjectHandler'
 
 import { addSequenceItem, runSequence } from './SequenceRunner'
 import { getHooks } from './GitHandler/Hooks'
 
 const HOOKS = getHooks()
+
+function generateActionChoices() {
+  var choicesList = []
+  const groupedActions = _.groupBy(HOOKS, 'category')
+  Object.keys(groupedActions).forEach(category => {
+    choicesList.push(new inquirer.Separator(`==${category}==`))
+    choicesList = [
+      ...choicesList,
+      ...groupedActions[category].map(action => {
+        return {
+          name: action.ruleName,
+          value: action,
+          checked: action.checked
+        }
+      })
+    ]
+  })
+  return choicesList
+}
 
 var projectCreationParametersQuestions = [
   {
@@ -87,24 +108,7 @@ var projectCreationParametersQuestions = [
     type: 'checkbox',
     name: 'hooks',
     message: 'Which hooks do you want to be installed?',
-    choices: HOOKS.map(hook => ({
-      name: hook.ruleName,
-      value: hook
-    }))
-  },
-  {
-    type: 'checkbox',
-    message: 'Which packages should be installed?',
-    name: 'packagesToInstall',
-    choices: [
-      new inquirer.Separator('==Code tools=='),
-      {
-        name: 'prettier',
-        value: { name: 'prettier', env: 'dev' },
-        checked: true
-      },
-      { name: 'eslint', value: { name: 'eslint', env: 'dev' }, checked: true }
-    ]
+    choices: generateActionChoices()
   },
   {
     type: 'checkbox',
@@ -125,15 +129,15 @@ async function createRepository() {
   GitHandler.setRepositoryPath(
     path.join(GitHandler.getRepositoryPath(), repositoryDetails.repositoryName)
   )
-  addSequenceItem(
-    () =>
-      GithubHandler.createRepository(
-        repositoryDetails.githubOrganizationName,
-        repositoryDetails.repositoryName,
-        repositoryDetails.publicity === 'private'
-      ),
-    'Creating Github repository'
-  )
+  // addSequenceItem(
+  //   () =>
+  //     GithubHandler.createRepository(
+  //       repositoryDetails.githubOrganizationName,
+  //       repositoryDetails.repositoryName,
+  //       repositoryDetails.publicity === 'private'
+  //     ),
+  //   'Creating Github repository'
+  // )
   addSequenceItem(
     () => GitHandler.initRepository(),
     'Creating temporary local repository'
@@ -160,16 +164,6 @@ async function createRepository() {
       ),
     `Initializing ${repositoryDetails.projectType} project in the repository`
   )
-  if (repositoryDetails.packagesToInstall) {
-    addSequenceItem(
-      () =>
-        installPackages(
-          GitHandler.getRepositoryPath(),
-          repositoryDetails.packagesToInstall
-        ),
-      'Installing given packages and setting configurations'
-    )
-  }
   addSequenceItem(
     () =>
       ConfigHandler.addDefaultReadme(

@@ -6,11 +6,6 @@ import writePkg from 'write-pkg'
 
 import { runCommand } from './utils/SystemUtils'
 
-const defaultConfigs = {
-  eslint: '.eslintrc',
-  prettier: '.prettierrc'
-}
-
 async function initializeProject(repositoryPath, projectType) {
   switch (projectType) {
     case 'create-react-app':
@@ -52,17 +47,6 @@ async function installPackages(repositoryPath, packages) {
           runCommand(installCommand, false, repositoryPath)
         )
       )
-      const packageNames = packages.map(npmPackage => npmPackage.name)
-      const availableConfigs = _.intersection(
-        packageNames,
-        Object.keys(defaultConfigs)
-      )
-      availableConfigs.forEach(config => {
-        fs.copyFileSync(
-          path.join('.', 'scripts', 'configs', defaultConfigs[config]),
-          path.join(repositoryPath, defaultConfigs[config])
-        )
-      })
     } catch (error) {
       reject(error)
     }

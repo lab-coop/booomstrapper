@@ -3,6 +3,7 @@
 import fs from 'fs-extra'
 import path from 'path'
 
+import { addDefaultConfig } from '../ConfigHandler'
 import { installPackages, addScript } from '../JsProjectHandler'
 
 const HOOK_DIR = '../../scripts/hooks'
@@ -45,6 +46,11 @@ async function addHuskyHooks(scriptsToInclude, repositoryPath) {
       name: scriptsToInclude[i].hookType,
       command: scriptsToInclude[i].execute
     })
+
+    if (scriptsToInclude[i].config) {
+      console.log(scriptsToInclude[i].config)
+      addDefaultConfig(repositoryPath, scriptsToInclude[i].config)
+    }
   }
 }
 
