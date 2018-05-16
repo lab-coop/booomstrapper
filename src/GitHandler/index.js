@@ -6,7 +6,6 @@ import path from 'path'
 
 import Logger from '../Logger'
 import { createEmptyFolder } from '../utils/SystemUtils'
-import { addHooks } from './Hooks'
 
 var repoLocation
 const tempFolder = path.join(osTmpdir(), 'booomstrapper_temp_dir')
@@ -72,7 +71,6 @@ module.exports = {
   pushBranch,
   pushToRemote,
   getCurrentBranch,
-  addHooks,
   setRepositoryPath,
   getRepositoryPath
 }

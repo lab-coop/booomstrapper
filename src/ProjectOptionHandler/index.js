@@ -1,4 +1,4 @@
-/** @module Hooks */
+/** @module ProjectOptionHandler */
 
 import fs from 'fs-extra'
 import path from 'path'
@@ -6,30 +6,30 @@ import path from 'path'
 import { addDefaultConfig } from '../ConfigHandler'
 import { installPackages, addScript } from '../JsProjectHandler'
 
-const HOOK_DIR = '../../scripts/hooks'
+const DESCRIPTOR_DIRECTORY = './ProjectOptionDescriptors'
 
 /**
- * Hook parsed from filesytem
- * @typedef {Object} ParsedHook
+ * Descriptor parsed from filesytem
+ * @typedef {Object} ParsedDescriptor
  * @property {string} ruleName - name of the rule in the filesystem
  * @property {string} execute - script to execute if that rule is included
- * @property {string[]} dependencies - dev dependecies needed for the hook
- * @property {string} hookType - type of the hook (eg. pre-commit)
+ * @property {string[]} dependencies - dev dependecies needed for the option
+ * @property {string} hookType - type of the option (eg. pre-commit)
  */
 
 /**
- * reads the hooks from HOOK_DIR
- * @return {ParsedHook[]}
+ * reads the descriptors from DESCRIPTOR_DIRECTORY
+ * @return {ParsedDescriptor[]}
  */
-function getHooks(hookFolderPath = path.join(__dirname, HOOK_DIR)) {
-  let hooksToAdd = fs.readdirSync(hookFolderPath)
-  return hooksToAdd
-    .filter(hookPath => hookPath.endsWith('.js'))
-    .map(hookPath => require(`${hookFolderPath}/${hookPath}`))
+function getProjectOptions(descriptorFolderPath = path.join(__dirname, DESCRIPTOR_DIRECTORY)) {
+  let optionToAdd = fs.readdirSync(descriptorFolderPath)
+  return optionToAdd
+    .filter(optionDescriptorPath => optionDescriptorPath.endsWith('.js'))
+    .map(optionDescriptorPath => require(`${descriptorFolderPath}/${optionDescriptorPath}`))
 }
 
 /**
- * @param {ParsedHook[]} scriptsToInclude
+ * @param {ParsedDescriptor[]} scriptsToInclude
  * @param {string} repositoryPath
  */
 async function addHuskyHooks(scriptsToInclude, repositoryPath) {
@@ -54,14 +54,14 @@ async function addHuskyHooks(scriptsToInclude, repositoryPath) {
 }
 
 /**
- * @param {ParsedHook[]} hooks
+ * @param {ParsedDescriptor[]} options
  * @param {string} repositoryPath
  */
-async function addHooks(hooks, repositoryPath) {
-  await addHuskyHooks(hooks, repositoryPath)
+async function enableProjectOptions(options, repositoryPath) {
+  await addHuskyHooks(options, repositoryPath)
 }
 
 module.exports = {
-  addHooks,
-  getHooks
+  enableProjectOptions,
+  getProjectOptions
 }
