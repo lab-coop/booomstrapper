@@ -6,7 +6,7 @@ export const TEST_DESCRIPTOR_CONTENT = {
   ruleName: 'angular----test',
   execute: 'validate-commit-msg',
   dependencies: ['validate-commit'],
-  hookType: 'commitmsg'
+  scriptName: 'commitmsg'
 }
 
 export const TEST_DESCRIPTOR_FILE_CONTENT = `module.exports = ${JSON.stringify(

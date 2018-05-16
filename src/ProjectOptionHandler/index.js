@@ -14,7 +14,7 @@ const DESCRIPTOR_DIRECTORY = './ProjectOptionDescriptors'
  * @property {string} ruleName - name of the rule in the filesystem
  * @property {string} execute - script to execute if that rule is included
  * @property {string[]} dependencies - dev dependecies needed for the option
- * @property {string} hookType - type of the option (eg. pre-commit)
+ * @property {string} scriptName - type of the option (eg. pre-commit)
  */
 
 /**
@@ -43,7 +43,7 @@ async function addHuskyHooks(scriptsToInclude, repositoryPath) {
   )
   for (let i = 0; i < scriptsToInclude.length; i++) {
     await addScript(repositoryPath, {
-      name: scriptsToInclude[i].hookType,
+      name: scriptsToInclude[i].scriptName,
       command: scriptsToInclude[i].execute
     })
 

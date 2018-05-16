@@ -50,7 +50,7 @@ test.serial(
 test('enableProjectOptions adds the required commands to package.json scripts', async t => {
   const packageScripts = getPkgContent(t.context.testProjectPath).scripts
   t.true(
-    packageScripts[TEST_DESCRIPTOR_CONTENT.hookType].includes(
+    packageScripts[TEST_DESCRIPTOR_CONTENT.scriptName].includes(
       TEST_DESCRIPTOR_CONTENT.execute
     )
   )
