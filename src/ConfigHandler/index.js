@@ -3,7 +3,7 @@
 import fs from 'fs'
 import path from 'path'
 
-const CONFIG_DIRECTORY = './assets/configs'
+const CONFIG_DIRECTORY = path.join(__dirname, '../../assets/configs')
 
 function addDefaultReadme(repoPath, repoName) {
   fs.writeFileSync(
