@@ -14,24 +14,26 @@ import { getProjectOptions, enableProjectOptions } from './ProjectOptionHandler'
 
 const supportedDependencies = getProjectOptions()
 
-function generateActionChoices() {
+function generateOptionList() {
   var choicesList = []
-  const groupedActions = _.groupBy(supportedDependencies, 'category')
-  Object.keys(groupedActions).forEach(category => {
+  const groupedOptions = _.groupBy(supportedDependencies, 'category')
+  Object.keys(groupedOptions).forEach(category => {
     choicesList.push(new inquirer.Separator(`==${category}==`))
     choicesList = [
       ...choicesList,
-      ...groupedActions[category].map(action => {
+      ...groupedOptions[category].map(option => {
         return {
-          name: action.ruleName,
-          value: action,
-          checked: action.checked
+          name: option.ruleName,
+          value: option,
+          checked: option.checked
         }
       })
     ]
   })
   return choicesList
 }
+
+const supportedOptions = generateOptionList()
 
 var projectCreationParametersQuestions = [
   {
@@ -82,7 +84,7 @@ var projectCreationParametersQuestions = [
     },
     validate: function (answer) {
       if (answer.length < 1) {
-        return 'The repository name should not be empty.'
+        return 'The default branch name should not be empty.'
       }
       return true
     }
@@ -112,7 +114,8 @@ var projectCreationParametersQuestions = [
     type: 'checkbox',
     name: 'selectedDependencies',
     message: 'Which dependencies do you want to be installed and configured?',
-    choices: generateActionChoices()
+    choices: supportedOptions,
+    pageSize: supportedOptions.length
   },
   {
     type: 'checkbox',
@@ -163,7 +166,7 @@ async function createRepository(options) {
         GitHandler.addRemote(
           'origin',
           `git@github.com:${repositoryDetails.githubOrganizationName}/${
-            repositoryDetails.repositoryName
+          repositoryDetails.repositoryName
           }.git`
         ),
       'Adding remote to local repository'

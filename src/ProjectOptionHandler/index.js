@@ -2,13 +2,39 @@
 
 import fs from 'fs-extra'
 import path from 'path'
-
 import _ from 'lodash'
+import Ajv from 'ajv';
 
+import Logger from '../Logger'
 import { addDefaultConfig } from '../ConfigHandler'
 import { installPackages, addScript } from '../JsProjectHandler'
 
 const DESCRIPTOR_DIRECTORY = './ProjectOptionDescriptors'
+const ajv = new Ajv({ allErrors: true })
+const schema = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['category', 'ruleName'],
+  properties: {
+    ruleName: { type: 'string' },
+    execute: { type: 'string' },
+    dependencies: { type: 'array', items: { type: 'string' } },
+    scriptName: { type: 'string' },
+    category: { type: 'string' },
+    checked: { type: 'boolean' },
+    config: { type: 'string' }
+  }
+};
+const validator = ajv.compile(schema)
+
+
+function validateDescriptor(descriptor) {
+  const validationResult = validator(descriptor)
+  if (!validationResult) {
+    Logger.error('Invalid option descriptor:', descriptor.ruleName)
+    Logger.debug(JSON.stringify(validator.errors, null, 2))
+  }
+}
 
 /**
  * Descriptor parsed from filesytem
@@ -27,39 +53,35 @@ function getProjectOptions(descriptorFolderPath = path.join(__dirname, DESCRIPTO
   let optionToAdd = fs.readdirSync(descriptorFolderPath)
   return optionToAdd
     .filter(optionDescriptorPath => optionDescriptorPath.endsWith('.js'))
-    .map(optionDescriptorPath => require(`${descriptorFolderPath}/${optionDescriptorPath}`))
+    .map(optionDescriptorPath => {
+      const descriptor = require(`${descriptorFolderPath}/${optionDescriptorPath}`)
+      validateDescriptor(descriptor)
+      return descriptor
+    })
 }
 
 /**
- * @param {ParsedDescriptor[]} scriptsToInclude
+ * @param {ParsedDescriptor[]} optionsToInclude
  * @param {string} repositoryPath
  */
-async function addHuskyHooks(scriptsToInclude, repositoryPath) {
-  const packagesToInstall = scriptsToInclude.reduce(
-    (acc, scriptInfo) => [...acc, ...scriptInfo.dependencies], []
+async function enableProjectOptions(optionsToInclude, repositoryPath) {
+  const packagesToInstall = optionsToInclude.reduce(
+    (acc, optionDescriptor) => [...acc, ...optionDescriptor.dependencies], []
   )
   await installPackages(
     repositoryPath,
     _.uniq(packagesToInstall).map(packageName => ({ name: packageName, env: 'dev' }))
   )
-  for (let i = 0; i < scriptsToInclude.length; i++) {
+  for (let i = 0; i < optionsToInclude.length; i++) {
     await addScript(repositoryPath, {
-      name: scriptsToInclude[i].scriptName,
-      command: scriptsToInclude[i].execute
+      name: optionsToInclude[i].scriptName,
+      command: optionsToInclude[i].execute
     })
 
-    if (scriptsToInclude[i].config) {
-      addDefaultConfig(repositoryPath, scriptsToInclude[i].config)
+    if (optionsToInclude[i].config) {
+      addDefaultConfig(repositoryPath, optionsToInclude[i].config)
     }
   }
-}
-
-/**
- * @param {ParsedDescriptor[]} options
- * @param {string} repositoryPath
- */
-async function enableProjectOptions(options, repositoryPath) {
-  await addHuskyHooks(options, repositoryPath)
 }
 
 module.exports = {

@@ -9,8 +9,8 @@
   },
   "scripts": {
     "lint": "eslint src",
-    "test": "ava --serial",
-    "testWithCoverage": "nyc --all ava --serial",
+    "test": "ava",
+    "testWithCoverage": "nyc --all ava",
     "babel:build": "babel src -d lib --delete-dir-on-start",
     "babel:watch": "babel src -d lib --delete-dir-on-start -w"
   },
