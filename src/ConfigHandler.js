@@ -15,10 +15,15 @@ function copyConfig(repoPath, configPath) {
 }
 
 function addDefaultConfigs(repoPath, configsToAdd) {
-  configsToAdd.map(config => copyConfig(repoPath, `./scripts/misc/.${config}`))
+  configsToAdd.map(config => addDefaultConfig(repoPath, config))
+}
+
+function addDefaultConfig(repoPath, configName) {
+  copyConfig(repoPath, `./scripts/configs/.${configName}`)
 }
 
 module.exports = {
   addDefaultReadme,
-  addDefaultConfigs
+  addDefaultConfigs,
+  addDefaultConfig
 }

@@ -19,7 +19,7 @@ let authMethodSelection = [
     message: 'Select Github authentication method',
     name: 'authMethod',
     choices: [{ name: 'oauth' }],
-    validate: function(answer) {
+    validate: function (answer) {
       if (answer.length < 1) {
         return 'You must choose at least one authentication method.'
       }
@@ -34,7 +34,7 @@ var tokenQuestion = [
     name: 'oauthToken',
     message: `Please provide your oAuth token
 🔑 https://github.com/settings/tokens`,
-    default: function() {
+    default: function () {
       return null
     }
   }
@@ -70,7 +70,7 @@ async function createRepository(
     const parsedError = JSON.parse(error.message)
     throw new Error(
       `${parsedError.message}${
-        parsedError.errors ? ' - ' + parsedError.errors[0].message : ''
+      parsedError.errors ? ' - ' + parsedError.errors[0].message : ''
       }`
     )
   }
@@ -103,6 +103,7 @@ async function checkAuthInfo() {
   try {
     octo.authenticate(Config.get('github.auth'))
     await octo.users.getKeys()
+    Logger.info('👊 Your Github authentication info is correct!\n')
   } catch (err) {
     if (err.code === 401 || !Config.get('github.auth').token) {
       Logger.info('🚫 Github authentication info is not correct.')
@@ -110,7 +111,7 @@ async function checkAuthInfo() {
       await checkAuthInfo()
     }
   }
-  Logger.info('👊 Your Github authentication info is correct!\n')
+
 }
 
 function resetAuthInfo() {

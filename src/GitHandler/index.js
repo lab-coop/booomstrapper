@@ -2,12 +2,10 @@
 
 import simpleGit from 'simple-git/promise'
 import osTmpdir from 'os-tmpdir'
-import fs from 'fs'
 import path from 'path'
 
 import Logger from '../Logger'
 import { createEmptyFolder } from '../utils/SystemUtils'
-import { addHooks } from './Hooks'
 
 var repoLocation
 const tempFolder = path.join(osTmpdir(), 'booomstrapper_temp_dir')
@@ -62,16 +60,6 @@ async function addRemote(remoteName, remotePath) {
   return simpleGit(repoLocation).addRemote(remoteName, remotePath)
 }
 
-function addDefaultHooks() {
-  const hooks = fs.readdirSync('./scripts/hooks/')
-  hooks.forEach(hook => {
-    fs.copyFileSync(
-      path.join('.', 'scripts', 'hooks', hook),
-      path.join(repoLocation, '.git', 'hooks', hook.replace('.sample', ''))
-    )
-  })
-}
-
 module.exports = {
   addRemote,
   createBranch,
@@ -83,8 +71,6 @@ module.exports = {
   pushBranch,
   pushToRemote,
   getCurrentBranch,
-  addDefaultHooks,
-  addHooks,
   setRepositoryPath,
   getRepositoryPath
 }

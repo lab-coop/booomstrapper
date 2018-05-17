@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 import inquirer from 'inquirer'
 import path from 'path'
 
@@ -5,22 +7,43 @@ import GitHandler from './GitHandler'
 import GithubHandler from './GithubHandler'
 import Logger from './Logger'
 import ConfigHandler from './ConfigHandler'
-import { initializeProject, installPackages } from './JsProjectHandler'
+import { initializeProject } from './JsProjectHandler'
 
 import { addSequenceItem, runSequence } from './SequenceRunner'
-import { getHooks } from './GitHandler/Hooks'
+import { getProjectOptions, enableProjectOptions } from './ProjectOptionHandler'
 
-const HOOKS = getHooks()
+const supportedDependencies = getProjectOptions()
+
+function generateOptionList() {
+  var choicesList = []
+  const groupedOptions = _.groupBy(supportedDependencies, 'category')
+  Object.keys(groupedOptions).forEach(category => {
+    choicesList.push(new inquirer.Separator(`==${category}==`))
+    choicesList = [
+      ...choicesList,
+      ...groupedOptions[category].map(option => {
+        return {
+          name: option.ruleName,
+          value: option,
+          checked: option.checked
+        }
+      })
+    ]
+  })
+  return choicesList
+}
+
+const supportedOptions = generateOptionList()
 
 var projectCreationParametersQuestions = [
   {
     type: 'input',
     name: 'githubOrganizationName',
     message: "What's the target Github Organization?",
-    default: function() {
+    default: function () {
       return 'booom-studio'
     },
-    validate: function(answer) {
+    validate: function (answer) {
       if (answer.length < 1) {
         return 'The organization name should not be empty.'
       }
@@ -32,7 +55,7 @@ var projectCreationParametersQuestions = [
     type: 'input',
     name: 'repositoryName',
     message: 'What should be the name of the repository?',
-    validate: function(answer) {
+    validate: function (answer) {
       if (answer.length < 1) {
         return 'The repository name should not be empty.'
       }
@@ -43,8 +66,8 @@ var projectCreationParametersQuestions = [
     type: 'list',
     message: 'Public or private repository',
     name: 'publicity',
-    choices: [{ name: 'public' }, { name: 'private' }],
-    validate: function(answer) {
+    choices: [{ name: 'private' }, { name: 'public' }],
+    validate: function (answer) {
       if (answer.length < 1) {
         return 'You must specify if the repository should be private or public.'
       }
@@ -56,12 +79,12 @@ var projectCreationParametersQuestions = [
     type: 'input',
     name: 'defaultBranchName',
     message: 'What should be the name of the default branch?',
-    default: function() {
+    default: function () {
       return 'master'
     },
-    validate: function(answer) {
+    validate: function (answer) {
       if (answer.length < 1) {
-        return 'The repository name should not be empty.'
+        return 'The default branch name should not be empty.'
       }
       return true
     }
@@ -70,26 +93,17 @@ var projectCreationParametersQuestions = [
     type: 'confirm',
     name: 'isDefaultBranchProtected',
     message: 'Should be the default branch protected?',
-    default: function() {
+    default: function () {
       return true
     },
     scope: 'remote'
-  },
-  {
-    type: 'checkbox',
-    name: 'hooks',
-    message: 'Which hooks do you want to be installed?',
-    choices: HOOKS.map(hook => ({
-      name: hook.ruleName,
-      value: hook
-    }))
   },
   {
     type: 'list',
     message: 'What type of project should be created?',
     name: 'projectType',
     choices: [{ name: 'create-react-app' }, { name: 'plain-node' }],
-    validate: function(answer) {
+    validate: function (answer) {
       if (answer.length < 1) {
         return 'You must specify if the project type.'
       }
@@ -98,16 +112,10 @@ var projectCreationParametersQuestions = [
   },
   {
     type: 'checkbox',
-    message: 'Which packages should be installed?',
-    name: 'packagesToInstall',
-    choices: [
-      {
-        name: 'prettier',
-        value: { name: 'prettier', env: 'dev' },
-        checked: true
-      },
-      { name: 'eslint', value: { name: 'eslint', env: 'dev' }, checked: true }
-    ]
+    name: 'selectedDependencies',
+    message: 'Which dependencies do you want to be installed and configured?',
+    choices: supportedOptions,
+    pageSize: supportedOptions.length
   },
   {
     type: 'checkbox',
@@ -158,7 +166,7 @@ async function createRepository(options) {
         GitHandler.addRemote(
           'origin',
           `git@github.com:${repositoryDetails.githubOrganizationName}/${
-            repositoryDetails.repositoryName
+          repositoryDetails.repositoryName
           }.git`
         ),
       'Adding remote to local repository'
@@ -172,16 +180,6 @@ async function createRepository(options) {
       ),
     `Initializing ${repositoryDetails.projectType} project in the repository`
   )
-  if (repositoryDetails.packagesToInstall) {
-    addSequenceItem(
-      () =>
-        installPackages(
-          GitHandler.getRepositoryPath(),
-          repositoryDetails.packagesToInstall
-        ),
-      'Installing given packages and setting configurations'
-    )
-  }
   addSequenceItem(
     () =>
       ConfigHandler.addDefaultReadme(
@@ -202,14 +200,13 @@ async function createRepository(options) {
       )}`
     )
   }
-  // todo: should be optional, selectable via a list
   addSequenceItem(
     () =>
-      GitHandler.addHooks(
-        repositoryDetails.hooks,
+      enableProjectOptions(
+        repositoryDetails.selectedDependencies,
         GitHandler.getRepositoryPath()
       ),
-    'Adding git hooks'
+    `Adding selected dependencies: ${repositoryDetails.selectedDependencies.map(d => d.ruleName).join(', ')}`
   )
   addSequenceItem(
     () => GitHandler.createCommit('Initial commit'),
@@ -252,7 +249,7 @@ async function createRepository(options) {
     }
 
     Logger.info(`
-  
+
 💣 💣 💣 💣 💣 BOOOM 💣 💣 💣 💣 💣
 
 Repository successfully created!
