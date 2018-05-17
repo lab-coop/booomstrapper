@@ -28,7 +28,7 @@ const schema = {
 const validator = ajv.compile(schema)
 
 
-function validateDescriptor(descriptor) {
+function _validateDescriptor(descriptor) {
   const validationResult = validator(descriptor)
   if (!validationResult) {
     Logger.error('Invalid option descriptor:', descriptor.ruleName)
@@ -55,7 +55,7 @@ function getProjectOptions(descriptorFolderPath = path.join(__dirname, DESCRIPTO
     .filter(optionDescriptorPath => optionDescriptorPath.endsWith('.js'))
     .map(optionDescriptorPath => {
       const descriptor = require(`${descriptorFolderPath}/${optionDescriptorPath}`)
-      validateDescriptor(descriptor)
+      _validateDescriptor(descriptor)
       return descriptor
     })
 }
