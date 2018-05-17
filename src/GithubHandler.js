@@ -136,12 +136,6 @@ async function checkAuthInfo(reset = false) {
       throw new Error('Unknown Github authentication error!')
     }
   }
-
-
-}
-
-function resetAuthInfo() {
-  Config.set('github.auth', '', true)
 }
 
 module.exports = {
