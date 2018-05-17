@@ -138,6 +138,10 @@ async function checkAuthInfo(reset = false) {
   }
 }
 
+function resetAuthInfo() {	
+  Config.set('github.auth', '', true)	
+}
+
 module.exports = {
   createRepository,
   listRepositories,
