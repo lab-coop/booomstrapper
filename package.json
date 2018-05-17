@@ -1,6 +1,6 @@
 {
   "name": "booomstrapper",
-  "version": "0.9.3",
+  "version": "0.10.0",
   "description": "booomstrapper for easy Github repository and project creation",
   "repository": "https://github.com/booom-studio/booomstrapper.git",
   "main": "./lib/App.js",
@@ -38,8 +38,8 @@
   },
   "ava": {
     "files": [
-			"src/**/*.test.js"
-		],
+      "src/**/*.test.js"
+    ],
     "sources": [
       "src/**/*.js"
     ],
@@ -50,6 +50,7 @@
   "dependencies": {
     "@babel/runtime": "7.0.0-beta.44",
     "@octokit/rest": "^15.2.6",
+    "ajv": "^6.5.0",
     "commander": "^2.15.1",
     "fs-extra": "^5.0.0",
     "inquirer": "^5.2.0",

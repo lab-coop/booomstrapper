@@ -250,7 +250,7 @@ async function createRepository(options) {
 
     Logger.info(`
 
-💣 💣 💣 💣 💣 BOOOM 💣 💣 💣 💣 💣
+💣 💣 💣 💣 💣  BOOOM 💣 💣 💣 💣 💣
 
 Repository successfully created!
 
