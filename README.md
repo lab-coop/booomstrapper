@@ -8,6 +8,12 @@
 yarn global add booomstrapper
 ```
 
+## How to use
+
+```sh
+booom init-repository
+```
+
 ## Features
 
 - create repository (public or private) in Github organization
