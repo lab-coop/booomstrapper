@@ -25,6 +25,8 @@
     "react/display-name": "off",
     "react/react-in-jsx-scope": "off",
     "camelcase": "warn",
-    "eqeqeq": "error"
+    "eqeqeq": "error",
+    "no-nested-ternary": "error",
+    "no-unneeded-ternary": "warn"
   }
 }
