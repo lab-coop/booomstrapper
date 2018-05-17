@@ -3,10 +3,12 @@
 node_modules
 .coverage
 .circleci
+.nyc_output
 .dockerignore
 .gitignore
 .babelrc
 .eslintrc
+.prettierrc
 src
 test
 logs

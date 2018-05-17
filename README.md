@@ -5,7 +5,7 @@
 ## Install via NPM
 
 ```js
-npm i -g booomstrapper
+yarn global add booomstrapper
 ```
 
 ## Features

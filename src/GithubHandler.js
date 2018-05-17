@@ -138,8 +138,11 @@ async function checkAuthInfo(reset = false) {
   }
 }
 
-function resetAuthInfo() {	
-  Config.set('github.auth', '', true)	
+async function resetAuthInfo() {
+  if (Config.get('github.auth')) {
+    Config.set('github.auth', null, true)
+  }
+  await checkAuthInfo()
 }
 
 module.exports = {
