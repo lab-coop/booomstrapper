@@ -19,7 +19,7 @@ let authMethodSelection = [
     message: 'Select Github authentication method',
     name: 'authMethod',
     choices: [{ name: 'oauth' }],
-    validate: function(answer) {
+    validate: function (answer) {
       if (answer.length < 1) {
         return 'You must choose at least one authentication method.'
       }
@@ -30,11 +30,22 @@ let authMethodSelection = [
 
 var tokenQuestion = [
   {
+    type: 'input',
+    name: 'userName',
+    message: 'Please provide your Github username',
+    validate: function (answer) {
+      if (answer.length < 1) {
+        return 'You must provide your Github username.'
+      }
+      return true
+    }
+  },
+  {
     type: 'password',
     name: 'oauthToken',
     message: `Please provide your oAuth token
 🔑 https://github.com/settings/tokens`,
-    default: function() {
+    default: function () {
       return null
     }
   }
@@ -70,7 +81,7 @@ async function createRepository(
     const parsedError = JSON.parse(error.message)
     throw new Error(
       `${parsedError.message}${
-        parsedError.errors ? ' - ' + parsedError.errors[0].message : ''
+      parsedError.errors ? ' - ' + parsedError.errors[0].message : ''
       }`
     )
   }
@@ -86,31 +97,47 @@ async function getRemoteRepositoryInfo(owner, repo) {
   return octo.repos.get({ owner, repo })
 }
 
-async function checkAuthInfo() {
+async function askForAuthInfo() {
+  const type = (await inquirer.prompt(authMethodSelection)).authMethod
+  const answer = (await inquirer.prompt(tokenQuestion))
+
+  authInfo = {
+    type,
+    token: answer.oauthToken,
+    userName: answer.userName
+  }
+  Config.set('github.auth', authInfo)
+  return authInfo
+}
+
+async function checkAuthInfo(reset = false) {
   var authInfo = Config.get('github.auth')
   if (!authInfo) {
+    reset = true
     Logger.info(
       '⚠️  Github authentication info is missing. Please provide them.\n'
     )
-    const type = (await inquirer.prompt(authMethodSelection)).authMethod
-    const token = (await inquirer.prompt(tokenQuestion)).oauthToken
-    authInfo = {
-      type,
-      token
-    }
-    Config.set('github.auth', authInfo)
+    authInfo = await askForAuthInfo()
   }
   try {
     octo.authenticate(Config.get('github.auth'))
-    await octo.users.getKeys()
+    await octo.users.getForUser({ username: authInfo.userName })
+    if (reset) {
+      Logger.info('👊 Your Github authentication info is correct!\n')
+    }
   } catch (err) {
     if (err.code === 401 || !Config.get('github.auth').token) {
       Logger.info('🚫 Github authentication info is not correct.')
-      resetAuthInfo()
-      await checkAuthInfo()
+      reset = true
+      await askForAuthInfo()
+      await checkAuthInfo(reset)
+    } else {
+      Logger.debug(err)
+      throw new Error('Unknown Github authentication error!')
     }
   }
-  Logger.info('👊 Your Github authentication info is correct!\n')
+
+
 }
 
 function resetAuthInfo() {
