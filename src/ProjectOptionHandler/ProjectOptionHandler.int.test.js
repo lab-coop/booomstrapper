@@ -9,21 +9,15 @@ import {
   getPkgContent
 } from '../utils/TestUtils'
 
-import {
-  TEST_DESCRIPTOR_PATH,
-  TEST_DESCRIPTOR_FILE_CONTENT,
-  TEST_DESCRIPTOR_CONTENT
-} from './ProjectOptionHandler.test.helper.js'
+import { TEST_DESCRIPTOR_CONTENT } from './ProjectOptionHandler.test.helper.js'
 
 test.beforeEach(async t => {
   const testProjectPath = await initializeTestProject()
-  fs.outputFileSync(TEST_DESCRIPTOR_PATH, TEST_DESCRIPTOR_FILE_CONTENT)
   await enableProjectOptions([TEST_DESCRIPTOR_CONTENT], testProjectPath)
   t.context.testProjectPath = testProjectPath
 })
 
 test.afterEach(t => {
-  fs.removeSync(TEST_DESCRIPTOR_PATH)
   fs.removeSync(t.context.testProjectPath)
 })
 
