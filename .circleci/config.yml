@@ -12,6 +12,9 @@ jobs:
           name: Install
           command: yarn
       - run:
+          name: Danger
+          command: yarn danger ci
+      - run:
           name: Linter
           command: yarn lint
       - run:
