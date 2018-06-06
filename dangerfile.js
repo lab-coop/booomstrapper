@@ -1,13 +1,24 @@
-import { danger, warn } from "danger";
+import { danger, warn, fail } from "danger";
+import includes from "lodash.includes"
 
-// No PR is too small to include a description of why you made a change
 if (danger.github.pr.body.length < 10) {
   warn("Please include a description of your PR changes.");
 }
 
-// Check that someone has been assigned to this PR
-if (danger.github.pr.assignee === null) {
-  warn(
-    "Please assign someone to review this PR"
-  );
+if (!danger.github.pr.assignee) {
+  const method = danger.github.pr.title.includes("WIP") ? warn : fail
+  method("This pull request needs an assignee, and optionally include any reviewers.")
+}
+
+const packageChanged = includes(danger.git.modified_files, 'package.json');
+const lockfileChanged = includes(danger.git.modified_files, 'yarn.lock');
+if (packageChanged && !lockfileChanged) {
+  const message = 'Changes were made to package.json, but not to yarn.lock';
+  const idea = 'Perhaps you need to run `yarn install`?';
+  fail(`${message} - <i>${idea}</i>`);
+}
+
+var bigPRThreshold = 600;
+if (danger.github.pr.additions + danger.github.pr.deletions > bigPRThreshold) {
+  warn('This pr seems to be a bit too big.')
 }
