@@ -1,5 +1,5 @@
 import { danger, warn, fail } from "danger";
-import includes from "lodash.includes"
+import includes from "lodash/includes"
 
 if (danger.github.pr.body.length < 10) {
   warn("Please include a description of your PR changes.");
