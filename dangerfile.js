@@ -1,4 +1,5 @@
-const { danger, warn, fail } = require("danger")
+const { danger, warn, fail, schedule } = require("danger")
+const { yarn } = require('danger-plugin-yarn')
 const { includes } = require("lodash")
 
 if (danger.github.pr.body.length < 10) {
@@ -22,3 +23,6 @@ var bigPRThreshold = 600;
 if (danger.github.pr.additions + danger.github.pr.deletions > bigPRThreshold) {
   warn('This pr seems to be a bit too big.')
 }
+
+
+schedule(yarn())
