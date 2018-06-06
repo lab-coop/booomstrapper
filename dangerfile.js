@@ -1,5 +1,5 @@
 import { danger, warn, fail } from "danger";
-import includes from "lodash/includes"
+import _ from 'lodash';
 
 if (danger.github.pr.body.length < 10) {
   warn("Please include a description of your PR changes.");
@@ -10,8 +10,8 @@ if (!danger.github.pr.assignee) {
   method("This pull request needs an assignee, and optionally include any reviewers.")
 }
 
-const packageChanged = includes(danger.git.modified_files, 'package.json');
-const lockfileChanged = includes(danger.git.modified_files, 'yarn.lock');
+const packageChanged = _.includes(danger.git.modified_files, 'package.json');
+const lockfileChanged = _.includes(danger.git.modified_files, 'yarn.lock');
 if (packageChanged && !lockfileChanged) {
   const message = 'Changes were made to package.json, but not to yarn.lock';
   const idea = 'Perhaps you need to run `yarn install`?';
