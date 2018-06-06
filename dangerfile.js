@@ -8,6 +8,6 @@ if (danger.github.pr.body.length < 10) {
 // Check that someone has been assigned to this PR
 if (danger.github.pr.assignee === null) {
   warn(
-    "Please assign someone to merge this PR, and optionally include people who should review."
+    "Please assign someone to review this PR"
   );
 }
