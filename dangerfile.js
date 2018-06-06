@@ -1,5 +1,5 @@
-import { danger, warn, fail } from "danger";
-import { includes } from "lodash";
+const { danger, warn, fail } = require("danger")
+const { includes } = require("lodash")
 
 if (danger.github.pr.body.length < 10) {
   warn("Please include a description of your PR changes.");
