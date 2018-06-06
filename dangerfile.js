@@ -1,5 +1,5 @@
 const { danger, warn, fail, schedule } = require("danger")
-const { yarn } = require('danger-plugin-yarn')
+const { checkForNewDependencies, checkForLockfileDiff, checkForTypesInDeps } = require('danger-plugin-yarn')
 const { includes } = require("lodash")
 
 if (danger.github.pr.body.length < 10) {
@@ -24,5 +24,10 @@ if (danger.github.pr.additions + danger.github.pr.deletions > bigPRThreshold) {
   warn('This pr seems to be a bit too big.')
 }
 
+schedule(async () => {
+  const packageDiff = await danger.git.JSONDiffForFile("package.json")
 
-schedule(yarn())
+  checkForNewDependencies(packageDiff)
+  checkForLockfileDiff(packageDiff)
+  checkForTypesInDeps(packageDiff)
+})
