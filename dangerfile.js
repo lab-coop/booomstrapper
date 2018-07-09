@@ -1,6 +1,6 @@
 const { message, danger, warn, fail, schedule } = require("danger")
 const { checkForNewDependencies, checkForLockfileDiff, checkForTypesInDeps } = require('danger-plugin-yarn')
-const { includes } = require("lodash/includes")
+const includes = require("lodash/includes")
 
 if (danger.github.pr.body.length < 10) {
   warn("Please include a description of your PR changes.");
