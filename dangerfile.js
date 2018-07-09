@@ -1,6 +1,6 @@
-const { danger, warn, fail, schedule } = require("danger")
+const { message, danger, warn, fail, schedule } = require("danger")
 const { checkForNewDependencies, checkForLockfileDiff, checkForTypesInDeps } = require('danger-plugin-yarn')
-const { includes } = require("lodash")
+const { includes } = require("lodash/includes")
 
 if (danger.github.pr.body.length < 10) {
   warn("Please include a description of your PR changes.");
@@ -24,9 +24,14 @@ if (danger.github.pr.additions + danger.github.pr.deletions > bigPRThreshold) {
   warn('This pr seems to be a bit too big.')
 }
 
+if (danger.github.pr.deletions > danger.github.pr.additions) {
+  message(
+    `👏 Great job! I see more lines deleted than added. Thanks for keeping us lean!`
+  )
+}
+
 schedule(async () => {
   const packageDiff = await danger.git.JSONDiffForFile("package.json")
-
   checkForNewDependencies(packageDiff)
   checkForLockfileDiff(packageDiff)
   checkForTypesInDeps(packageDiff)
